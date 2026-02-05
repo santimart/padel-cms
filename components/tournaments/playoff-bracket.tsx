@@ -92,13 +92,19 @@ export function PlayoffBracket({ tournamentId }: PlayoffBracketProps) {
 
       setMatches((data || []) as PlayoffMatch[])
 
-      // Determine available rounds
-      const rounds = [...new Set((data || []).map(m => m.round))].filter(Boolean)
-      setAvailableRounds(rounds as string[])
+      // Determine available rounds and sort them logically
+      const roundOrder = ['R32', 'R16', 'QF', 'SF', 'F']
+      const existingRounds = [...new Set((data || []).map(m => m.round))].filter(Boolean) as string[]
       
-      // Set initial selected round
-      if (rounds.length > 0 && !rounds.includes(selectedRound)) {
-        setSelectedRound(rounds[0] as string)
+      const sortedRounds = existingRounds.sort((a, b) => {
+        return roundOrder.indexOf(a) - roundOrder.indexOf(b)
+      })
+      
+      setAvailableRounds(sortedRounds)
+      
+      // Set initial selected round (default to the earliest available round, e.g., QF)
+      if (sortedRounds.length > 0 && !sortedRounds.includes(selectedRound)) {
+        setSelectedRound(sortedRounds[0])
       }
     } catch (err) {
       console.error('Error loading playoff matches:', err)
