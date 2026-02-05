@@ -24,6 +24,8 @@ interface MatchScorerProps {
   pair1Id: string
   pair2Id: string
   currentStatus: string
+  phase?: string
+  round?: string
   onSuccess?: () => void
 }
 
@@ -34,6 +36,8 @@ export function MatchScorer({
   pair1Id,
   pair2Id,
   currentStatus,
+  phase,
+  round,
   onSuccess,
 }: MatchScorerProps) {
   const [open, setOpen] = useState(false)
@@ -170,6 +174,22 @@ export function MatchScorer({
         .eq('id', matchId)
 
       if (updateError) throw updateError
+
+      // If this is a playoff match, advance the winner to the next round
+      if (phase === 'playoffs' && round) {
+        try {
+          const response = await fetch(`/api/matches/${matchId}/advance-winner`, {
+            method: 'POST',
+          })
+          
+          if (!response.ok) {
+            console.error('Failed to advance winner to next round')
+          }
+        } catch (advanceError) {
+          console.error('Error advancing winner:', advanceError)
+          // Don't fail the whole operation if advancement fails
+        }
+      }
 
       setOpen(false)
       if (onSuccess) onSuccess()

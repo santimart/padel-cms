@@ -10,9 +10,11 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import { GenerateZonesButton } from '@/components/tournaments/generate-zones-button'
+import { GeneratePlayoffsButton } from '@/components/tournaments/generate-playoffs-button'
 import { DeletePairButton } from '@/components/tournaments/delete-pair-button'
 import { ZonesDisplay } from '@/components/tournaments/zones-display'
 import { MatchesDisplay } from '@/components/tournaments/matches-display'
+import { PlayoffBracket } from '@/components/tournaments/playoff-bracket'
 import type { Tournament, Pair, Player } from '@/lib/types'
 
 type TournamentWithComplex = Tournament & {
@@ -35,6 +37,7 @@ export default function TournamentDetailPage() {
 
   const [tournament, setTournament] = useState<TournamentWithComplex | null>(null)
   const [pairs, setPairs] = useState<PairWithPlayers[]>([])
+  const [hasPlayoffs, setHasPlayoffs] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -76,6 +79,16 @@ export default function TournamentDetailPage() {
 
       if (pairsError) throw pairsError
       setPairs(pairsData || [])
+
+      // Check if playoffs exist
+      const { data: playoffMatches } = await supabase
+        .from('matches')
+        .select('id')
+        .eq('tournament_id', tournamentId)
+        .eq('phase', 'playoffs')
+        .limit(1)
+
+      setHasPlayoffs((playoffMatches?.length || 0) > 0)
     } catch (err: any) {
       console.error('Error loading tournament:', err)
       setError(err.message)
@@ -200,6 +213,11 @@ export default function TournamentDetailPage() {
             <TabsTrigger value="matches" disabled={tournament.status === 'registration'}>
               Partidos
             </TabsTrigger>
+            {hasPlayoffs && (
+              <TabsTrigger value="playoffs">
+                Playoffs
+              </TabsTrigger>
+            )}
             <TabsTrigger value="settings">
               Configuración
             </TabsTrigger>
@@ -299,8 +317,45 @@ export default function TournamentDetailPage() {
 
           {/* Matches Tab */}
           <TabsContent value="matches">
-            <MatchesDisplay tournamentId={tournamentId} />
+            <div className="space-y-6">
+              <MatchesDisplay tournamentId={tournamentId} />
+              
+              {/* Generate Playoffs Button */}
+              {tournament.status !== 'registration' && !hasPlayoffs && (
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center space-y-4">
+                      <h3 className="text-lg font-semibold">¿Listo para los Playoffs?</h3>
+                      <p className="text-muted-foreground">
+                        Completa todos los partidos de zona para generar el bracket de playoffs
+                      </p>
+                      <GeneratePlayoffsButton 
+                        tournamentId={tournamentId} 
+                        onSuccess={loadTournamentData} 
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </TabsContent>
+
+          {/* Playoffs Tab */}
+          {hasPlayoffs && (
+            <TabsContent value="playoffs">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Bracket de Playoffs</CardTitle>
+                  <CardDescription>
+                    Fase eliminatoria con los mejores equipos de cada zona
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PlayoffBracket tournamentId={tournamentId} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
 
           {/* Settings Tab */}
           <TabsContent value="settings">

@@ -145,7 +145,7 @@ export async function POST(
         for (let k = j + 1; k < zonePairs.length; k++) {
           matches.push({
             tournament_id: tournamentId,
-            phase: 'zone',
+            phase: 'zones',
             zone_id: zone.id,
             pair1_id: zonePairs[j].id,
             pair2_id: zonePairs[k].id,

@@ -104,6 +104,8 @@ CREATE TABLE matches (
   status TEXT CHECK (status IN ('scheduled', 'in_progress', 'completed', 'walkover')) DEFAULT 'scheduled',
   scheduled_time TIMESTAMPTZ,
   court_number INTEGER,
+  round TEXT CHECK (round IN ('R32', 'R16', 'QF', 'SF', 'F')),
+  bracket_position INTEGER,
   completed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
