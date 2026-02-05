@@ -23,6 +23,10 @@ export default function CreateTournamentPage() {
     maxPairs: '',
     startDate: '',
     endDate: '',
+    dailyStartTime: '09:00',
+    dailyEndTime: '21:00',
+    matchDuration: '60',
+    availableCourts: '2',
   })
   const [loading, setLoading] = useState(false)
   const [loadingComplexes, setLoadingComplexes] = useState(true)
@@ -96,6 +100,10 @@ export default function CreateTournamentPage() {
           max_pairs: formData.maxPairs ? parseInt(formData.maxPairs) : null,
           start_date: formData.startDate || null,
           end_date: formData.endDate || null,
+          daily_start_time: formData.dailyStartTime,
+          daily_end_time: formData.dailyEndTime,
+          match_duration_minutes: parseInt(formData.matchDuration),
+          available_courts: parseInt(formData.availableCourts),
           status: 'registration',
         })
         .select()
@@ -323,6 +331,78 @@ export default function CreateTournamentPage() {
                       onChange={handleChange}
                       disabled={loading}
                     />
+                  </div>
+                </div>
+
+                {/* Scheduling Configuration */}
+                <div className="border-t border-border pt-4 mt-4">
+                  <h3 className="text-sm font-medium mb-4">Configuración de Horarios</h3>
+                  
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="dailyStartTime">Hora de Inicio Diaria</Label>
+                      <Input
+                        id="dailyStartTime"
+                        name="dailyStartTime"
+                        type="time"
+                        value={formData.dailyStartTime}
+                        onChange={handleChange}
+                        disabled={loading}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Hora de inicio de partidos cada día
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="dailyEndTime">Hora de Fin Diaria</Label>
+                      <Input
+                        id="dailyEndTime"
+                        name="dailyEndTime"
+                        type="time"
+                        value={formData.dailyEndTime}
+                        onChange={handleChange}
+                        disabled={loading}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Hora de fin de partidos cada día
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="matchDuration">Duración por Partido (min)</Label>
+                      <Input
+                        id="matchDuration"
+                        name="matchDuration"
+                        type="number"
+                        min="30"
+                        max="180"
+                        step="15"
+                        value={formData.matchDuration}
+                        onChange={handleChange}
+                        disabled={loading}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Duración estimada (default: 60 min)
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="availableCourts">Canchas Disponibles</Label>
+                      <Input
+                        id="availableCourts"
+                        name="availableCourts"
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={formData.availableCourts}
+                        onChange={handleChange}
+                        disabled={loading}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Número de canchas para partidos simultáneos
+                      </p>
+                    </div>
                   </div>
                 </div>
 

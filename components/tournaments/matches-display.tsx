@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { EditMatchTime } from '@/components/tournaments/edit-match-time'
+import { MatchScorer } from '@/components/tournaments/match-scorer'
 import type { Pair, Player } from '@/lib/types'
 
 interface Zone {
@@ -21,9 +23,12 @@ interface Match {
   match_number: number | null
   pair1_sets: number
   pair2_sets: number
+  pair1_games: any // JSONB field
+  pair2_games: any // JSONB field
   winner_id: string | null
   status: string
   scheduled_time: string | null
+  court_number: number | null
   completed_at: string | null
   created_at: string
 }
@@ -139,6 +144,16 @@ export function MatchesDisplay({ tournamentId }: MatchesDisplayProps) {
     matchesByZone[zoneName].push(match)
   })
 
+  const formatMatchTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const dayName = date.toLocaleDateString('es-AR', { weekday: 'short' })
+    const dayNum = date.getDate()
+    const month = date.toLocaleDateString('es-AR', { month: 'short' })
+    const time = date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+    
+    return `${dayName} ${dayNum} ${month} - ${time}hs`
+  }
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
       scheduled: { label: 'Programado', variant: 'outline' },
@@ -169,6 +184,22 @@ export function MatchesDisplay({ tournamentId }: MatchesDisplayProps) {
                   className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex-1">
+                    {/* Scheduled time */}
+                    {match.scheduled_time && (
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="text-xs text-muted-foreground">
+                          📅 {formatMatchTime(match.scheduled_time)}
+                          {match.court_number && ` • Cancha ${match.court_number}`}
+                        </div>
+                        <EditMatchTime
+                          matchId={match.id}
+                          currentTime={match.scheduled_time}
+                          currentCourt={match.court_number}
+                          onSuccess={loadMatches}
+                        />
+                      </div>
+                    )}
+                    
                     <div className="flex items-center gap-4">
                       <div className="flex-1">
                         <div className="font-medium text-sm">
@@ -180,8 +211,33 @@ export function MatchesDisplay({ tournamentId }: MatchesDisplayProps) {
                       </div>
                       <div className="text-center min-w-[60px]">
                         {match.status === 'completed' ? (
-                          <div className="text-lg font-bold">
-                            {match.pair1_sets} - {match.pair2_sets}
+                          <div>
+                            <div className="text-lg font-bold">
+                              {match.pair1_sets} - {match.pair2_sets}
+                            </div>
+                            {/* Detailed set scores */}
+                            {match.pair1_games && match.pair2_games && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {(() => {
+                                  try {
+                                    const pair1Games = typeof match.pair1_games === 'string' 
+                                      ? JSON.parse(match.pair1_games) 
+                                      : match.pair1_games
+                                    const pair2Games = typeof match.pair2_games === 'string'
+                                      ? JSON.parse(match.pair2_games)
+                                      : match.pair2_games
+                                    
+                                    if (Array.isArray(pair1Games) && Array.isArray(pair2Games)) {
+                                      return `(${pair1Games.map((p1Score: number, idx: number) => 
+                                        `${p1Score}-${pair2Games[idx]}`
+                                      ).join(', ')})`
+                                    }
+                                  } catch (e) {
+                                    return null
+                                  }
+                                })()}
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <div className="text-sm text-muted-foreground">vs</div>
@@ -189,7 +245,16 @@ export function MatchesDisplay({ tournamentId }: MatchesDisplayProps) {
                       </div>
                     </div>
                   </div>
-                  <div className="ml-4">
+                  <div className="ml-4 flex items-center gap-2">
+                    <MatchScorer
+                      matchId={match.id}
+                      pair1Name={`${match.pair1.player1.first_name} ${match.pair1.player1.last_name} / ${match.pair1.player2.first_name} ${match.pair1.player2.last_name}`}
+                      pair2Name={`${match.pair2.player1.first_name} ${match.pair2.player1.last_name} / ${match.pair2.player2.first_name} ${match.pair2.player2.last_name}`}
+                      pair1Id={match.pair1_id}
+                      pair2Id={match.pair2_id}
+                      currentStatus={match.status}
+                      onSuccess={loadMatches}
+                    />
                     {getStatusBadge(match.status)}
                   </div>
                 </div>

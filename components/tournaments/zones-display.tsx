@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { ZoneStandings } from '@/components/tournaments/zone-standings'
 import type { Pair, Player } from '@/lib/types'
 
 interface Zone {
@@ -158,6 +159,17 @@ export function ZonesDisplay({ tournamentId }: ZonesDisplayProps) {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+              
+              {/* Standings Table */}
+              {zonePairs.length > 0 && (
+                <div className="mt-6">
+                  <ZoneStandings
+                    tournamentId={tournamentId}
+                    zoneId={zone.id}
+                    zoneName={zone.name}
+                  />
                 </div>
               )}
             </CardContent>

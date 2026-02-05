@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateZones, distributePairsIntoZones, getZoneName } from '@/lib/tournament/zone-generator'
+import { scheduleMatches } from '@/lib/tournament/match-scheduler'
 
 export async function POST(
   request: Request,
@@ -10,16 +11,22 @@ export async function POST(
     const { id: tournamentId } = await params
     const supabase = await createClient()
 
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    // Get current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
     // Get tournament and verify ownership
     const { data: tournament, error: tournamentError } = await supabase
       .from('tournaments')
-      .select('*, complexes!inner(owner_id)')
+      .select(`
+        *,
+        complex:complexes (
+          id,
+          owner_id
+        )
+      `)
       .eq('id', tournamentId)
       .single()
 
@@ -27,8 +34,11 @@ export async function POST(
       return NextResponse.json({ error: 'Torneo no encontrado' }, { status: 404 })
     }
 
-    if (tournament.complexes.owner_id !== user.id) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
+    if (tournament.complex.owner_id !== user.id) {
+      return NextResponse.json(
+        { error: 'No tienes permiso para modificar este torneo' },
+        { status: 403 }
+      )
     }
 
     // Check tournament is in registration phase
@@ -82,51 +92,55 @@ export async function POST(
     // Create zones in database
     const zonesData = []
     for (let i = 0; i < numZones; i++) {
-      const { data: zone, error: zoneError } = await supabase
-        .from('zones')
-        .insert({
-          tournament_id: tournamentId,
-          name: getZoneName(i),
-        })
-        .select()
-        .single()
+      zonesData.push({
+        tournament_id: tournamentId,
+        name: getZoneName(i),
+      })
+    }
 
-      if (zoneError) {
-        throw zoneError
-      }
+    const { data: createdZones, error: zonesError } = await supabase
+      .from('zones')
+      .insert(zonesData)
+      .select()
 
-      zonesData.push(zone)
+    if (zonesError || !createdZones) {
+      throw zonesError
+    }
 
-      // Assign pairs to this zone
+    // Assign pairs to zones
+    for (let i = 0; i < createdZones.length; i++) {
+      const zone = createdZones[i]
       const zonePairs = distribution[i]
+
       if (zonePairs && zonePairs.length > 0) {
-        const updates = zonePairs.map(pair => ({
+        const pairUpdates = zonePairs.map(pair => ({
           id: pair.id,
           zone_id: zone.id,
         }))
 
-        for (const update of updates) {
-          const { error: updateError } = await supabase
+        for (const update of pairUpdates) {
+          const { error: pairUpdateError } = await supabase
             .from('pairs')
             .update({ zone_id: update.zone_id })
             .eq('id', update.id)
 
-          if (updateError) {
-            throw updateError
+          if (pairUpdateError) {
+            throw pairUpdateError
           }
         }
       }
     }
 
-    // Generate matches for each zone (round-robin)
-    for (let i = 0; i < numZones; i++) {
-      const zone = zonesData[i]
+    // Generate round-robin matches for each zone
+    const allMatches = []
+    for (let i = 0; i < createdZones.length; i++) {
+      const zone = createdZones[i]
       const zonePairs = distribution[i]
 
-      if (!zonePairs || zonePairs.length < 2) continue
+      if (!zonePairs || zonePairs.length === 0) continue
 
-      // Generate all possible matches (round-robin)
       const matches = []
+      // Round-robin: each pair plays every other pair once
       for (let j = 0; j < zonePairs.length; j++) {
         for (let k = j + 1; k < zonePairs.length; k++) {
           matches.push({
@@ -135,19 +149,53 @@ export async function POST(
             zone_id: zone.id,
             pair1_id: zonePairs[j].id,
             pair2_id: zonePairs[k].id,
-            match_number: matches.length + 1,
+            match_number: allMatches.length + matches.length + 1,
           })
         }
       }
 
-      // Insert matches
-      if (matches.length > 0) {
-        const { error: matchesError } = await supabase
-          .from('matches')
-          .insert(matches)
+      allMatches.push(...matches)
+    }
 
-        if (matchesError) {
-          throw matchesError
+    // Insert matches
+    if (allMatches.length > 0) {
+      const { data: createdMatches, error: matchesError } = await supabase
+        .from('matches')
+        .insert(allMatches)
+        .select()
+
+      if (matchesError) {
+        throw matchesError
+      }
+
+      // Schedule matches if tournament has dates configured
+      if (tournament.start_date && tournament.end_date && createdMatches) {
+        const scheduledMatches = scheduleMatches(
+          createdMatches,
+          pairs,
+          {
+            startDate: new Date(tournament.start_date),
+            endDate: new Date(tournament.end_date),
+            dailyStartTime: tournament.daily_start_time || '09:00',
+            dailyEndTime: tournament.daily_end_time || '21:00',
+            matchDurationMinutes: tournament.match_duration_minutes || 60,
+            availableCourts: tournament.available_courts || 1,
+          }
+        )
+
+        // Update matches with scheduled times and court numbers
+        for (const scheduled of scheduledMatches) {
+          const { error: scheduleError } = await supabase
+            .from('matches')
+            .update({ 
+              scheduled_time: scheduled.scheduledTime.toISOString(),
+              court_number: scheduled.courtNumber
+            })
+            .eq('id', scheduled.matchId)
+
+          if (scheduleError) {
+            console.error('Error scheduling match:', scheduleError)
+          }
         }
       }
     }
@@ -164,9 +212,8 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      numZones,
-      pairsPerZone,
-      message: `Se generaron ${numZones} zonas con ${pairs.length} parejas`,
+      zones: createdZones.length,
+      matches: allMatches.length,
     })
   } catch (error: any) {
     console.error('Error generating zones:', error)

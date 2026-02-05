@@ -23,6 +23,7 @@ CREATE TABLE players (
   last_name TEXT NOT NULL,
   phone TEXT,
   photo_url TEXT,
+  gender TEXT CHECK (gender IN ('Masculino', 'Femenino')),
   current_category INTEGER CHECK (current_category BETWEEN 1 AND 7),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -51,6 +52,10 @@ CREATE TABLE tournaments (
   max_pairs INTEGER,
   start_date DATE,
   end_date DATE,
+  daily_start_time TIME DEFAULT '09:00',
+  daily_end_time TIME DEFAULT '21:00',
+  match_duration_minutes INTEGER DEFAULT 60,
+  available_courts INTEGER DEFAULT 1,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -86,22 +91,23 @@ CREATE INDEX idx_pairs_zone ON pairs(zone_id);
 CREATE TABLE matches (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   tournament_id UUID REFERENCES tournaments(id) ON DELETE CASCADE,
-  phase TEXT CHECK (phase IN ('zone', 'playoff')) NOT NULL,
-  zone_id UUID REFERENCES zones(id),
-  pair1_id UUID REFERENCES pairs(id),
-  pair2_id UUID REFERENCES pairs(id),
+  phase TEXT CHECK (phase IN ('zones', 'playoffs')) DEFAULT 'zones',
+  zone_id UUID REFERENCES zones(id) ON DELETE SET NULL,
+  pair1_id UUID REFERENCES pairs(id) ON DELETE CASCADE,
+  pair2_id UUID REFERENCES pairs(id) ON DELETE CASCADE,
   match_number INTEGER,
   pair1_sets INTEGER DEFAULT 0,
   pair2_sets INTEGER DEFAULT 0,
-  pair1_games JSONB DEFAULT '[]'::jsonb,
-  pair2_games JSONB DEFAULT '[]'::jsonb,
+  pair1_games JSONB,
+  pair2_games JSONB,
   winner_id UUID REFERENCES pairs(id),
   status TEXT CHECK (status IN ('scheduled', 'in_progress', 'completed', 'walkover')) DEFAULT 'scheduled',
   scheduled_time TIMESTAMPTZ,
+  court_number INTEGER,
   completed_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX idx_matches_tournament ON matches(tournament_id);
 CREATE INDEX idx_matches_zone ON matches(zone_id);
 CREATE INDEX idx_matches_match_number ON matches(match_number);
