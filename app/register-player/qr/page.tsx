@@ -12,8 +12,8 @@ export default function QRGeneratorPage() {
   const [tournamentId, setTournamentId] = useState('')
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
   const registrationUrl = tournamentId 
-    ? `${baseUrl}/register-player?tournament=${tournamentId}`
-    : `${baseUrl}/register-player`
+    ? `${baseUrl}/register-player/public?tournament=${tournamentId}`
+    : `${baseUrl}/register-player/public`
 
   const handleDownloadQR = () => {
     const svg = document.getElementById('qr-code')

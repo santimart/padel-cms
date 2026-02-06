@@ -43,18 +43,35 @@ export default function AddPairPage() {
   const searchPlayers = async (term: string, playerNumber: 1 | 2) => {
     try {
       const supabase = createClient()
+      
+      // Fetch all players and do client-side filtering for accent-insensitive search
+      // This is more reliable than relying on PostgreSQL's ilike which is accent-sensitive
       const { data, error } = await supabase
         .from('players')
         .select('*')
-        .or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,dni.ilike.%${term}%`)
-        .limit(5)
+        .limit(100) // Fetch more results to filter client-side
 
       if (error) throw error
 
+      // Normalize both search term and results to remove accents
+      const normalizedTerm = term.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+      
+      const filteredData = (data || [])
+        .filter(player => {
+          const normalizedFirstName = player.first_name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+          const normalizedLastName = player.last_name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+          const normalizedDni = player.dni.toLowerCase()
+          
+          return normalizedFirstName.includes(normalizedTerm) ||
+                 normalizedLastName.includes(normalizedTerm) ||
+                 normalizedDni.includes(normalizedTerm)
+        })
+        .slice(0, 5) // Limit to 5 results after filtering
+
       if (playerNumber === 1) {
-        setSearchResults1(data || [])
+        setSearchResults1(filteredData)
       } else {
-        setSearchResults2(data || [])
+        setSearchResults2(filteredData)
       }
     } catch (err) {
       console.error('Error searching players:', err)
@@ -180,7 +197,7 @@ export default function AddPairPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
                 {error && (
                   <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                     {error}
@@ -201,6 +218,7 @@ export default function AddPairPage() {
                         setSelectedPlayer1(null)
                       }}
                       disabled={loading}
+                      autoComplete="off"
                     />
                     {searchResults1.length > 0 && (
                       <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-auto">
@@ -265,6 +283,7 @@ export default function AddPairPage() {
                         setSelectedPlayer2(null)
                       }}
                       disabled={loading}
+                      autoComplete="off"
                     />
                     {searchResults2.length > 0 && (
                       <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-auto">

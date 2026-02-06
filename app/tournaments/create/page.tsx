@@ -207,7 +207,7 @@ export default function CreateTournamentPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
                 {error && (
                   <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                     {error}
@@ -225,6 +225,7 @@ export default function CreateTournamentPage() {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    autoComplete="off"
                   />
                 </div>
 
@@ -302,6 +303,7 @@ export default function CreateTournamentPage() {
                     value={formData.maxPairs}
                     onChange={handleChange}
                     disabled={loading}
+                    autoComplete="off"
                   />
                   <p className="text-xs text-muted-foreground">
                     Deja vacío para no limitar las inscripciones
@@ -318,6 +320,7 @@ export default function CreateTournamentPage() {
                       value={formData.startDate}
                       onChange={handleChange}
                       disabled={loading}
+                      autoComplete="off"
                     />
                   </div>
 
@@ -330,6 +333,7 @@ export default function CreateTournamentPage() {
                       value={formData.endDate}
                       onChange={handleChange}
                       disabled={loading}
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -348,6 +352,7 @@ export default function CreateTournamentPage() {
                         value={formData.dailyStartTime}
                         onChange={handleChange}
                         disabled={loading}
+                        autoComplete="off"
                       />
                       <p className="text-xs text-muted-foreground">
                         Hora de inicio de partidos cada día
@@ -363,6 +368,7 @@ export default function CreateTournamentPage() {
                         value={formData.dailyEndTime}
                         onChange={handleChange}
                         disabled={loading}
+                        autoComplete="off"
                       />
                       <p className="text-xs text-muted-foreground">
                         Hora de fin de partidos cada día
@@ -381,6 +387,7 @@ export default function CreateTournamentPage() {
                         value={formData.matchDuration}
                         onChange={handleChange}
                         disabled={loading}
+                        autoComplete="off"
                       />
                       <p className="text-xs text-muted-foreground">
                         Duración estimada (default: 60 min)
@@ -398,6 +405,7 @@ export default function CreateTournamentPage() {
                         value={formData.availableCourts}
                         onChange={handleChange}
                         disabled={loading}
+                        autoComplete="off"
                       />
                       <p className="text-xs text-muted-foreground">
                         Número de canchas para partidos simultáneos
