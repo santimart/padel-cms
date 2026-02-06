@@ -44,34 +44,33 @@ export default function AddPairPage() {
     try {
       const supabase = createClient()
       
-      // Fetch all players and do client-side filtering for accent-insensitive search
-      // This is more reliable than relying on PostgreSQL's ilike which is accent-sensitive
+      // Use PostgreSQL unaccent function for scalable accent-insensitive search
       const { data, error } = await supabase
-        .from('players')
-        .select('*')
-        .limit(100) // Fetch more results to filter client-side
+        .rpc('search_players_unaccent', { search_term: term })
 
-      if (error) throw error
-
-      // Normalize both search term and results to remove accents
-      const normalizedTerm = term.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-      
-      const filteredData = (data || [])
-        .filter(player => {
-          const normalizedFirstName = player.first_name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-          const normalizedLastName = player.last_name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-          const normalizedDni = player.dni.toLowerCase()
-          
-          return normalizedFirstName.includes(normalizedTerm) ||
-                 normalizedLastName.includes(normalizedTerm) ||
-                 normalizedDni.includes(normalizedTerm)
-        })
-        .slice(0, 5) // Limit to 5 results after filtering
+      if (error) {
+        // Fallback to regular search if RPC fails (e.g., function not yet created)
+        console.warn('Unaccent search failed, falling back to regular search:', error)
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('players')
+          .select('*')
+          .or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,dni.ilike.%${term}%`)
+          .limit(5)
+        
+        if (fallbackError) throw fallbackError
+        
+        if (playerNumber === 1) {
+          setSearchResults1(fallbackData || [])
+        } else {
+          setSearchResults2(fallbackData || [])
+        }
+        return
+      }
 
       if (playerNumber === 1) {
-        setSearchResults1(filteredData)
+        setSearchResults1(data || [])
       } else {
-        setSearchResults2(filteredData)
+        setSearchResults2(data || [])
       }
     } catch (err) {
       console.error('Error searching players:', err)
