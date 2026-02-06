@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -44,6 +44,7 @@ export function MatchScorer({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isWalkover, setIsWalkover] = useState(false)
+  const firstInputRef = useRef<HTMLInputElement>(null)
   
   const [scores, setScores] = useState({
     set1: { pair1: '', pair2: '' },
@@ -51,7 +52,33 @@ export function MatchScorer({
     set3: { pair1: '', pair2: '' },
   })
 
+  // Auto-focus first input when modal opens
+  useEffect(() => {
+    if (open && !isWalkover) {
+      // Use a longer timeout to ensure the dialog is fully rendered
+      const timer = setTimeout(() => {
+        firstInputRef.current?.focus()
+      }, 150)
+      return () => clearTimeout(timer)
+    }
+  }, [open, isWalkover])
+
   const handleScoreChange = (set: 'set1' | 'set2' | 'set3', pair: 'pair1' | 'pair2', value: string) => {
+    // Prevent leading zeros (e.g., "01" is invalid)
+    if (value.length > 1 && value.startsWith('0')) {
+      return
+    }
+    
+    // Limit to 2 digits max
+    if (value.length > 2) {
+      return
+    }
+    
+    // Only allow numbers
+    if (value !== '' && !/^\d+$/.test(value)) {
+      return
+    }
+    
     setScores(prev => ({
       ...prev,
       [set]: {
@@ -247,25 +274,28 @@ export function MatchScorer({
                 <Label className="text-sm font-medium mb-2 block">Set 1</Label>
                 <div className="grid grid-cols-3 gap-2 items-center">
                   <Input
-                    type="number"
-                    min="0"
-                    max="7"
+                    ref={firstInputRef}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="0"
                     value={scores.set1.pair1}
                     onChange={(e) => handleScoreChange('set1', 'pair1', e.target.value)}
                     disabled={loading}
                     className="text-center"
+                    maxLength={2}
                   />
                   <span className="text-center text-sm text-muted-foreground">-</span>
                   <Input
-                    type="number"
-                    min="0"
-                    max="7"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="0"
                     value={scores.set1.pair2}
                     onChange={(e) => handleScoreChange('set1', 'pair2', e.target.value)}
                     disabled={loading}
                     className="text-center"
+                    maxLength={2}
                   />
                 </div>
               </div>
@@ -275,25 +305,27 @@ export function MatchScorer({
                 <Label className="text-sm font-medium mb-2 block">Set 2</Label>
                 <div className="grid grid-cols-3 gap-2 items-center">
                   <Input
-                    type="number"
-                    min="0"
-                    max="7"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="0"
                     value={scores.set2.pair1}
                     onChange={(e) => handleScoreChange('set2', 'pair1', e.target.value)}
                     disabled={loading}
                     className="text-center"
+                    maxLength={2}
                   />
                   <span className="text-center text-sm text-muted-foreground">-</span>
                   <Input
-                    type="number"
-                    min="0"
-                    max="7"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="0"
                     value={scores.set2.pair2}
                     onChange={(e) => handleScoreChange('set2', 'pair2', e.target.value)}
                     disabled={loading}
                     className="text-center"
+                    maxLength={2}
                   />
                 </div>
               </div>
@@ -303,25 +335,27 @@ export function MatchScorer({
                 <Label className="text-sm font-medium mb-2 block">Set 3 (opcional)</Label>
                 <div className="grid grid-cols-3 gap-2 items-center">
                   <Input
-                    type="number"
-                    min="0"
-                    max="7"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="0"
                     value={scores.set3.pair1}
                     onChange={(e) => handleScoreChange('set3', 'pair1', e.target.value)}
                     disabled={loading}
                     className="text-center"
+                    maxLength={2}
                   />
                   <span className="text-center text-sm text-muted-foreground">-</span>
                   <Input
-                    type="number"
-                    min="0"
-                    max="7"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="0"
                     value={scores.set3.pair2}
                     onChange={(e) => handleScoreChange('set3', 'pair2', e.target.value)}
                     disabled={loading}
                     className="text-center"
+                    maxLength={2}
                   />
                 </div>
               </div>
