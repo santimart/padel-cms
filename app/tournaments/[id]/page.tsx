@@ -97,9 +97,10 @@ export default function TournamentDetailPage() {
         .select('id, status')
         .eq('tournament_id', tournamentId)
         .eq('phase', 'zones')
+        .returns<{ id: string, status: string }[]>()
       
-      const allCompleted = zoneMatches && zoneMatches.length > 0 && 
-        zoneMatches.every(match => match.status === 'completed' || match.status === 'walkover')
+      const allCompleted = Boolean(zoneMatches && zoneMatches.length > 0 && 
+        zoneMatches.every(match => match.status === 'completed' || match.status === 'walkover'))
       setAllZoneMatchesCompleted(allCompleted)
     } catch (err: any) {
       console.error('Error loading tournament:', err)
@@ -330,7 +331,10 @@ export default function TournamentDetailPage() {
           {/* Matches Tab */}
           <TabsContent value="matches">
             <div className="space-y-6">
-              <MatchesDisplay tournamentId={tournamentId} />
+              <MatchesDisplay 
+                tournamentId={tournamentId} 
+                onMatchUpdate={loadTournamentData}
+              />
               
               {/* Generate Playoffs Button */}
               {tournament.status !== 'registration' && !hasPlayoffs && (

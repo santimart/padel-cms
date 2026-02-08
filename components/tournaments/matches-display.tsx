@@ -46,9 +46,10 @@ type MatchWithPairs = Match & {
 
 interface MatchesDisplayProps {
   tournamentId: string
+  onMatchUpdate?: () => void
 }
 
-export function MatchesDisplay({ tournamentId }: MatchesDisplayProps) {
+export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayProps) {
   const [matches, setMatches] = useState<MatchWithPairs[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -87,6 +88,11 @@ export function MatchesDisplay({ tournamentId }: MatchesDisplayProps) {
       if (matchesError) throw matchesError
 
       setMatches((matchesData || []) as MatchWithPairs[])
+      
+      // Notify parent component about updates
+      if (onMatchUpdate) {
+        onMatchUpdate()
+      }
     } catch (err: any) {
       console.error('Error loading matches:', err)
       setError(err.message)
