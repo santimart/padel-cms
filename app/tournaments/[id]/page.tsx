@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { formatName } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -290,7 +291,7 @@ export default function TournamentDetailPage() {
                           </div>
                           <div>
                             <div className="font-medium">
-                              {pair.player1.first_name} {pair.player1.last_name} / {pair.player2.first_name} {pair.player2.last_name}
+                              {formatName(pair.player1.first_name)} {formatName(pair.player1.last_name)} / {formatName(pair.player2.first_name)} {formatName(pair.player2.last_name)}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {pair.player1.current_category && pair.player2.current_category && (
@@ -316,7 +317,11 @@ export default function TournamentDetailPage() {
 
                 {tournament.status === 'registration' && pairs.length >= 4 && (
                   <div className="mt-6 pt-6 border-t">
-                    <GenerateZonesButton tournamentId={tournamentId} onSuccess={loadTournamentData} />
+                    <GenerateZonesButton 
+                    tournamentId={tournamentId} 
+                    pairsCount={pairs.length}
+                    onSuccess={loadTournamentData} 
+                  />
                   </div>
                 )}
               </CardContent>
