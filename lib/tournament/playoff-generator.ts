@@ -234,3 +234,55 @@ export function getNextRoundMatch(
   }
 }
 
+
+/**
+ * Generate the full bracket tree (all matches from R32/R16... to Final)
+ * Returns all matches that need to be created
+ */
+export function generateFullBracket(qualified: QualifiedPair[]): BracketMatch[] {
+  // 1. Create first round matches
+  const firstRoundMatches = createBracket(qualified)
+  const allMatches: BracketMatch[] = [...firstRoundMatches]
+  
+  // 2. We need to simulate the progression to generate future matches
+  // We can do this by grouping matches by round and creating the next round
+  
+  let currentRoundMatches = firstRoundMatches
+  
+  while (currentRoundMatches.length > 0) {
+    const nextRoundMatches: BracketMatch[] = []
+    const nextRoundMap = new Map<number, BracketMatch>()
+    
+    // Process each match in the current round to find where its winner goes
+    for (const match of currentRoundMatches) {
+      const nextRoundInfo = getNextRoundMatch(match.round, match.bracketPosition)
+      
+      if (!nextRoundInfo) continue // Final match, no next round
+      
+      const { nextRound, nextBracketPosition } = nextRoundInfo
+      
+      if (!nextRound) continue // Should not happen given check above, but for types
+
+      // Check if we already created this next round match (since 2 matches feed into 1)
+      if (!nextRoundMap.has(nextBracketPosition)) {
+        const newMatch: BracketMatch = {
+          round: nextRound,
+          bracketPosition: nextBracketPosition,
+          pair1Id: null, // TBD
+          pair2Id: null, // TBD
+        }
+        nextRoundMap.set(nextBracketPosition, newMatch)
+        nextRoundMatches.push(newMatch)
+      }
+    }
+    
+    if (nextRoundMatches.length > 0) {
+      allMatches.push(...nextRoundMatches)
+      currentRoundMatches = nextRoundMatches
+    } else {
+      break // No more rounds to generate
+    }
+  }
+  
+  return allMatches
+}

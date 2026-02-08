@@ -107,6 +107,10 @@ export interface Database {
           max_pairs: number | null
           start_date: string | null
           end_date: string | null
+          daily_start_time: string | null
+          daily_end_time: string | null
+          match_duration_minutes: number | null
+          available_courts: number | null
           created_at: string
           updated_at: string
         }
@@ -120,6 +124,10 @@ export interface Database {
           max_pairs?: number | null
           start_date?: string | null
           end_date?: string | null
+          daily_start_time?: string | null
+          daily_end_time?: string | null
+          match_duration_minutes?: number | null
+          available_courts?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -133,6 +141,10 @@ export interface Database {
           max_pairs?: number | null
           start_date?: string | null
           end_date?: string | null
+          daily_start_time?: string | null
+          daily_end_time?: string | null
+          match_duration_minutes?: number | null
+          available_courts?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -193,10 +205,10 @@ export interface Database {
         Row: {
           id: string
           tournament_id: string
-          phase: 'zone' | 'playoff'
+          phase: 'zones' | 'playoffs'
           zone_id: string | null
-          pair1_id: string
-          pair2_id: string
+          pair1_id: string | null
+          pair2_id: string | null
           pair1_sets: number
           pair2_sets: number
           pair1_games: Json
@@ -204,16 +216,19 @@ export interface Database {
           winner_id: string | null
           status: 'scheduled' | 'in_progress' | 'completed' | 'walkover'
           scheduled_time: string | null
+          court_number: number | null
+          round: 'R32' | 'R16' | 'QF' | 'SF' | 'F' | null
+          bracket_position: number | null
           completed_at: string | null
           created_at: string
         }
         Insert: {
           id?: string
           tournament_id: string
-          phase: 'zone' | 'playoff'
+          phase: 'zones' | 'playoffs'
           zone_id?: string | null
-          pair1_id: string
-          pair2_id: string
+          pair1_id: string | null
+          pair2_id: string | null
           pair1_sets?: number
           pair2_sets?: number
           pair1_games?: Json
@@ -221,6 +236,9 @@ export interface Database {
           winner_id?: string | null
           status?: 'scheduled' | 'in_progress' | 'completed' | 'walkover'
           scheduled_time?: string | null
+          court_number?: number | null
+          round?: 'R32' | 'R16' | 'QF' | 'SF' | 'F' | null
+          bracket_position?: number | null
           completed_at?: string | null
           created_at?: string
         }
@@ -229,8 +247,8 @@ export interface Database {
           tournament_id?: string
           phase?: 'zone' | 'playoff'
           zone_id?: string | null
-          pair1_id?: string
-          pair2_id?: string
+          pair1_id?: string | null
+          pair2_id?: string | null
           pair1_sets?: number
           pair2_sets?: number
           pair1_games?: Json
@@ -238,6 +256,9 @@ export interface Database {
           winner_id?: string | null
           status?: 'scheduled' | 'in_progress' | 'completed' | 'walkover'
           scheduled_time?: string | null
+          court_number?: number | null
+          round?: 'R32' | 'R16' | 'QF' | 'SF' | 'F' | null
+          bracket_position?: number | null
           completed_at?: string | null
           created_at?: string
         }

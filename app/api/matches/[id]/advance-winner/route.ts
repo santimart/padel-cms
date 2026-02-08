@@ -1,6 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { getNextRoundMatch } from '@/lib/tournament/playoff-generator'
+import { Match, MatchUpdate, Tournament } from '@/lib/types'
+
+interface MatchWithTournament extends Match {
+  tournament: Tournament
+}
 
 export async function POST(
   request: Request,
@@ -24,8 +29,12 @@ export async function POST(
       )
     }
 
+    // Checking phase and status safely with typed object (Supabase inference might still return loose types for joins)
+    // We cast to our extended interface
+    const matchData = match as unknown as MatchWithTournament
+
     // Only process playoff matches
-    if (match.phase !== 'playoffs') {
+    if (matchData.phase !== 'playoffs') {
       return NextResponse.json(
         { error: 'Only playoff matches can advance winners' },
         { status: 400 }
@@ -33,7 +42,7 @@ export async function POST(
     }
 
     // Ensure match is completed and has a winner
-    if (match.status !== 'completed' || !match.winner_id) {
+    if (matchData.status !== 'completed' || !matchData.winner_id) {
       return NextResponse.json(
         { error: 'Match must be completed with a winner' },
         { status: 400 }
@@ -41,7 +50,13 @@ export async function POST(
     }
 
     // Get next round information
-    const nextRoundInfo = getNextRoundMatch(match.round, match.bracket_position)
+    // Need to cast round because DB type allows null but logic implies it exists for playoff match
+    if (!matchData.round || matchData.bracket_position === null) {
+         // Should not happen for valid playoff match
+         return NextResponse.json({ error: 'Invalid playoff match data' }, { status: 400 })
+    }
+
+    const nextRoundInfo = getNextRoundMatch(matchData.round, matchData.bracket_position)
     
     if (!nextRoundInfo) {
       // This was the final - tournament is complete!
@@ -49,7 +64,7 @@ export async function POST(
         success: true,
         message: 'Tournament complete! Winner determined.',
         isFinal: true,
-        winnerId: match.winner_id,
+        winnerId: matchData.winner_id,
       })
     }
 
@@ -59,19 +74,25 @@ export async function POST(
     const { data: existingNextMatch } = await supabase
       .from('matches')
       .select('*')
-      .eq('tournament_id', match.tournament_id)
+      .eq('tournament_id', matchData.tournament_id)
       .eq('phase', 'playoffs')
       .eq('round', nextRound)
       .eq('bracket_position', nextBracketPosition)
+      .returns<Match>()
       .single()
 
     if (existingNextMatch) {
       // Update existing match with the winner
-      const updateField = isTopSlot ? 'pair1_id' : 'pair2_id'
+      const updatePayload: MatchUpdate = {}
+      if (isTopSlot) {
+        updatePayload.pair1_id = matchData.winner_id
+      } else {
+        updatePayload.pair2_id = matchData.winner_id
+      }
       
       const { error: updateError } = await supabase
         .from('matches')
-        .update({ [updateField]: match.winner_id })
+        .update(updatePayload)
         .eq('id', existingNextMatch.id)
 
       if (updateError) throw updateError
@@ -83,32 +104,12 @@ export async function POST(
         nextRound,
       })
     } else {
-      // Create new next round match
-      const newMatch = {
-        tournament_id: match.tournament_id,
-        phase: 'playoffs',
-        round: nextRound,
-        bracket_position: nextBracketPosition,
-        pair1_id: isTopSlot ? match.winner_id : null,
-        pair2_id: isTopSlot ? null : match.winner_id,
-        status: 'scheduled',
-      }
-
-      const { data: createdMatch, error: createError } = await supabase
-        .from('matches')
-        .insert(newMatch)
-        .select()
-        .single()
-
-      if (createError) throw createError
-
-      return NextResponse.json({
-        success: true,
-        message: `Winner advanced to ${nextRound}`,
-        nextMatchId: createdMatch.id,
-        nextRound,
-        created: true,
-      })
+      // Should not happen if full bracket is generated
+       console.warn('Next round match not found, but should exist in full bracket mode')
+       return NextResponse.json(
+        { error: 'Next round match not found' },
+        { status: 404 }
+      )
     }
 
   } catch (error: any) {

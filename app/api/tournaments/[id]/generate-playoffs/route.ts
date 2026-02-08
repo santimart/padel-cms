@@ -1,11 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { 
-  calculateZoneStandings, 
-  getQualifiedPairs, 
-  createBracket 
-} from '@/lib/tournament/playoff-generator'
+import { calculateZoneStandings, getQualifiedPairs, generateFullBracket, BracketMatch } from '@/lib/tournament/playoff-generator'
 import { scheduleMatches } from '@/lib/tournament/match-scheduler'
+import { TournamentWithComplex, PairWithPlayers, Match } from '@/lib/types'
 
 export async function POST(
   request: Request,
@@ -15,10 +12,16 @@ export async function POST(
     const { id: tournamentId } = await params
     const supabase = await createClient()
 
-    // 1. Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError || !user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    // 1. Verify user is authenticated
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
 
     // 2. Get tournament and verify ownership
@@ -41,7 +44,11 @@ export async function POST(
       )
     }
 
-    if (tournament.complex.owner_id !== user.id) {
+    // Checking ownership
+    // We cast to TournamentWithComplex to access the joined relation safely
+    const tournamentWithComplex = tournament as unknown as TournamentWithComplex
+
+    if (tournamentWithComplex.complex.owner_id !== user.id) {
       return NextResponse.json(
         { error: 'No tienes permiso para modificar este torneo' },
         { status: 403 }
@@ -83,16 +90,17 @@ export async function POST(
       .select('*')
       .eq('tournament_id', tournamentId)
       .eq('phase', 'zones')
+      .returns<Match[]>()
 
     if (matchesError) throw matchesError
 
     // 6. Verify all zone matches are completed
-    const incompleteMatches = matches?.filter(m => m.status !== 'completed') || []
+    const incompleteMatches = matches?.filter(m => m.status !== 'completed' && m.status !== 'walkover') || []
     if (incompleteMatches.length > 0) {
       return NextResponse.json(
-        { 
+        {
           error: 'All zone matches must be completed before generating playoffs',
-          incompleteCount: incompleteMatches.length 
+          incompleteCount: incompleteMatches.length
         },
         { status: 400 }
       )
@@ -107,10 +115,12 @@ export async function POST(
         player2:players!pairs_player2_id_fkey(*)
       `)
       .eq('tournament_id', tournamentId)
+      .returns<PairWithPlayers[]>()
 
     if (pairsError) throw pairsError
 
     // 8. Calculate zone standings
+    // matches and pairs are strictly typed now from supabase
     const standingsByZone = calculateZoneStandings(matches || [], pairs || [], zones)
 
     // 9. Get qualified pairs (top 2 per zone)
@@ -123,24 +133,30 @@ export async function POST(
       )
     }
 
-    // 10. Create bracket structure
-    const bracketMatches = createBracket(qualified)
+    // 10. Create full bracket structure
+    const bracketMatches = generateFullBracket(qualified)
 
     // 11. Schedule playoff matches
     const schedulingConfig = {
-      tournamentStartDate: new Date(tournament.start_date),
-      tournamentEndDate: new Date(tournament.end_date),
-      dailyStartTime: tournament.daily_start_time || '09:00',
-      dailyEndTime: tournament.daily_end_time || '21:00',
-      matchDurationMinutes: tournament.match_duration_minutes || 60,
-      availableCourts: tournament.available_courts || 1,
+      startDate: new Date(tournamentWithComplex.start_date || new Date()), // Handle nulls with default/fallback
+      endDate: new Date(tournamentWithComplex.end_date || new Date()),
+      dailyStartTime: tournamentWithComplex.daily_start_time || '09:00',
+      dailyEndTime: tournamentWithComplex.daily_end_time || '21:00',
+      matchDurationMinutes: tournamentWithComplex.match_duration_minutes || 60,
+      availableCourts: tournamentWithComplex.available_courts || 1,
     }
 
     // Create match objects for scheduling
+    // Casting to any because scheduleMatches expects Match but we are passing partial data
+    // Ideally scheduleMatches should accept a broader type
     const matchesToSchedule = bracketMatches.map((bm, index) => ({
       id: `temp-${index}`,
-      pair1_id: bm.pair1Id || '',
-      pair2_id: bm.pair2Id || '',
+      pair1_id: bm.pair1Id || null,
+      pair2_id: bm.pair2Id || null,
+      round: bm.round,
+      tournament_id: tournamentId,
+      phase: 'playoffs',
+      status: 'scheduled'
     }))
 
     const scheduledMatches = scheduleMatches(
@@ -149,29 +165,34 @@ export async function POST(
       schedulingConfig
     )
 
-    // 12. Insert playoff matches into database
-    const playoffMatchesData = bracketMatches.map((bm, index) => {
-      const scheduled = scheduledMatches.find(sm => sm.matchId === `temp-${index}`)
-      
-      return {
-        tournament_id: tournamentId,
-        phase: 'playoffs',
-        round: bm.round,
-        bracket_position: bm.bracketPosition,
-        pair1_id: bm.pair1Id,
-        pair2_id: bm.pair2Id,
-        scheduled_time: scheduled?.scheduledTime?.toISOString() || null,
-        court_number: scheduled?.courtNumber || null,
-        status: 'scheduled',
-      }
+    // 12. Create matches in database
+    // Iterate to insert (or bulk insert if logic allows, but need mapped bracket_position)
+    // Actually we can map directly from bracketMatches since they map 1-to-1 to scheduledMatches if order verified
+
+    // Better reconstruction of insert payload
+    const finalMatchesToInsert = bracketMatches.map((bm, index) => {
+        // Since we mapped bracketMatches -> matchesToSchedule 1-to-1 using index, we can just use index for scheduledMatches
+        const scheduled = scheduledMatches[index]
+
+        return {
+            tournament_id: tournamentId,
+            phase: 'playoffs',
+            round: bm.round,
+            bracket_position: bm.bracketPosition,
+            pair1_id: bm.pair1Id || null,
+            pair2_id: bm.pair2Id || null,
+            scheduled_time: scheduled?.scheduledTime ? scheduled.scheduledTime.toISOString() : null,
+            court_number: scheduled?.courtNumber || null,
+            status: 'scheduled'
+        }
     })
 
-    const { data: createdMatches, error: createError } = await supabase
+    const { data: createdMatches, error: insertError } = await supabase
       .from('matches')
-      .insert(playoffMatchesData)
+      .insert(finalMatchesToInsert as any) // Cast one last time until insert type is perfectly aligned
       .select()
 
-    if (createError) throw createError
+    if (insertError) throw insertError
 
     return NextResponse.json({
       success: true,

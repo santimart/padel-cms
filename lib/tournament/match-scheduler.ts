@@ -47,28 +47,85 @@ export function scheduleMatches(
   // Track court usage: Map<"YYYY-MM-DD HH:MM", Set<courtNumber>>
   const courtUsage = new Map<string, Set<number>>()
   
-  for (const match of matches) {
+  // Sort matches by round priority (R32 -> R16 -> QF -> SF -> F)
+  const roundPriority: Record<string, number> = {
+    'R32': 1,
+    'R16': 2,
+    'QF': 3,
+    'SF': 4,
+    'F': 5
+  }
+
+  const sortedMatches = [...matches].sort((a, b) => {
+    // If running from API, 'round' might be present in the match object even if not in type definition yet
+    // because we cast 'matchesToSchedule as any' in the route
+    const roundA = (a as any).round
+    const roundB = (b as any).round
+    
+    if (roundA && roundB) {
+      return (roundPriority[roundA] || 0) - (roundPriority[roundB] || 0)
+    }
+    return 0
+  })
+  
+  // Keep track of the latest scheduled time for each round to ensure
+  // next round starts AFTER previous round finishes
+  const roundLastScheduledTime = new Map<string, Date>()
+
+  for (const match of sortedMatches) {
     let scheduled = false
+    const matchRound = (match as any).round
+    
+    // Determine minimum start time based on previous round
+    let minStartTime: Date | null = null
+    if (matchRound) {
+      const prevRoundPriority = (roundPriority[matchRound] || 0) - 1
+      const prevRound = Object.keys(roundPriority).find(key => roundPriority[key] === prevRoundPriority)
+      
+      if (prevRound) {
+        // Find the latest time scheduled for the previous round
+        // We want to start next round at least after that (or next day)
+        // Ideally we'd look at specifically the feeding matches, but global round layering is safer/easier
+         const prevRoundTime = roundLastScheduledTime.get(prevRound)
+         if (prevRoundTime) {
+            // Start at least 2 hours after the LAST match of the previous round 
+            // This is a loose heuristic to avoid "Round 2 starts before Round 1 ends"
+            minStartTime = new Date(prevRoundTime.getTime() + 120 * 60000) 
+         }
+      }
+    }
     
     // Try each day
     for (let dayIndex = 0; dayIndex < tournamentDays.length && !scheduled; dayIndex++) {
       const currentDay = tournamentDays[dayIndex]
       
+      // If we have a min start time (e.g. from previous round), skip days before that
+      if (minStartTime && currentDay < new Date(minStartTime.setHours(0,0,0,0))) {
+        continue
+      }
+
       // Try each time slot
       for (let slotIndex = 0; slotIndex < slotsPerDay.length && !scheduled; slotIndex++) {
         const slotTime = slotsPerDay[slotIndex]
         const matchTime = combineDateAndTime(currentDay, slotTime)
         
-        // Check if both pairs have sufficient rest
-        const pair1LastTime = pairLastMatchTime.get(match.pair1_id)
-        const pair2LastTime = pairLastMatchTime.get(match.pair2_id)
+        // Check if this time matches our minimum start time requirement
+        if (minStartTime && matchTime < minStartTime) {
+             continue
+        }
+
+        // Check if both pairs have sufficient rest (only if pairs are known)
+        let restCheckPassed = true
+        if (match.pair1_id && pairLastMatchTime.has(match.pair1_id)) {
+             const lastTime = pairLastMatchTime.get(match.pair1_id)!
+             if (getMinutesDifference(lastTime, matchTime) < 60) restCheckPassed = false
+        }
+        if (match.pair2_id && pairLastMatchTime.has(match.pair2_id)) {
+             const lastTime = pairLastMatchTime.get(match.pair2_id)!
+             if (getMinutesDifference(lastTime, matchTime) < 60) restCheckPassed = false
+        }
         
-        const minimumRestMinutes = 60 // APA/FAP rule
-        const canSchedule = 
-          (!pair1LastTime || getMinutesDifference(pair1LastTime, matchTime) >= minimumRestMinutes) &&
-          (!pair2LastTime || getMinutesDifference(pair2LastTime, matchTime) >= minimumRestMinutes)
-        
-        if (!canSchedule) continue
+        if (!restCheckPassed) continue
         
         // Find available court for this time slot
         const timeKey = matchTime.toISOString()
@@ -95,11 +152,20 @@ export function scheduleMatches(
           usedCourts.add(assignedCourt)
           courtUsage.set(timeKey, usedCourts)
           
-          // Update last match time for both pairs
+          // Update last match time for pairs (if known)
           const matchEndTime = new Date(matchTime.getTime() + config.matchDurationMinutes * 60000)
-          pairLastMatchTime.set(match.pair1_id, matchEndTime)
-          pairLastMatchTime.set(match.pair2_id, matchEndTime)
           
+          if (match.pair1_id) pairLastMatchTime.set(match.pair1_id, matchEndTime)
+          if (match.pair2_id) pairLastMatchTime.set(match.pair2_id, matchEndTime)
+          
+          // Update round tracking
+          if (matchRound) {
+            const currentLast = roundLastScheduledTime.get(matchRound)
+            if (!currentLast || matchTime > currentLast) {
+                roundLastScheduledTime.set(matchRound, matchTime)
+            }
+          }
+
           scheduled = true
         }
       }

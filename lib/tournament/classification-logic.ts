@@ -40,6 +40,8 @@ export function calculateZoneStandings(
   matches
     .filter((match) => match.status === 'completed')
     .forEach((match) => {
+      if (!match.pair1_id || !match.pair2_id) return
+      
       const pair1Standing = standings.get(match.pair1_id)
       const pair2Standing = standings.get(match.pair2_id)
 

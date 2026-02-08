@@ -43,6 +43,11 @@ export interface ZoneWithPairs extends Zone {
   pairs: PairWithPlayers[]
 }
 
+export interface PlayoffMatch extends Match {
+  pair1: (PairWithPlayers & { zone?: { name: string } }) | null
+  pair2: (PairWithPlayers & { zone?: { name: string } }) | null
+}
+
 // Zone standings calculation
 export interface ZoneStanding {
   pair: PairWithPlayers
