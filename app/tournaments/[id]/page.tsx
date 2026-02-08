@@ -38,6 +38,7 @@ export default function TournamentDetailPage() {
   const [tournament, setTournament] = useState<TournamentWithComplex | null>(null)
   const [pairs, setPairs] = useState<PairWithPlayers[]>([])
   const [hasPlayoffs, setHasPlayoffs] = useState(false)
+  const [allZoneMatchesCompleted, setAllZoneMatchesCompleted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -89,6 +90,17 @@ export default function TournamentDetailPage() {
         .limit(1)
 
       setHasPlayoffs((playoffMatches?.length || 0) > 0)
+
+      // Check if all zone matches are completed
+      const { data: zoneMatches } = await supabase
+        .from('matches')
+        .select('id, status')
+        .eq('tournament_id', tournamentId)
+        .eq('phase', 'zones')
+      
+      const allCompleted = zoneMatches && zoneMatches.length > 0 && 
+        zoneMatches.every(match => match.status === 'completed' || match.status === 'walkover')
+      setAllZoneMatchesCompleted(allCompleted)
     } catch (err: any) {
       console.error('Error loading tournament:', err)
       setError(err.message)
@@ -331,7 +343,8 @@ export default function TournamentDetailPage() {
                       </p>
                       <GeneratePlayoffsButton 
                         tournamentId={tournamentId} 
-                        onSuccess={loadTournamentData} 
+                        onSuccess={loadTournamentData}
+                        allMatchesCompleted={allZoneMatchesCompleted}
                       />
                     </div>
                   </CardContent>

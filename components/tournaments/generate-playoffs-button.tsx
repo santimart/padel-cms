@@ -17,9 +17,10 @@ import { Trophy, Loader2 } from 'lucide-react'
 interface GeneratePlayoffsButtonProps {
   tournamentId: string
   onSuccess: () => void
+  allMatchesCompleted?: boolean
 }
 
-export function GeneratePlayoffsButton({ tournamentId, onSuccess }: GeneratePlayoffsButtonProps) {
+export function GeneratePlayoffsButton({ tournamentId, onSuccess, allMatchesCompleted = true }: GeneratePlayoffsButtonProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -54,7 +55,7 @@ export function GeneratePlayoffsButton({ tournamentId, onSuccess }: GeneratePlay
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="gap-2">
+        <Button size="lg" className="gap-2" disabled={!allMatchesCompleted}>
           <Trophy className="h-5 w-5" />
           Generar Playoffs
         </Button>
@@ -83,9 +84,17 @@ export function GeneratePlayoffsButton({ tournamentId, onSuccess }: GeneratePlay
             </ul>
           </div>
 
-          <div className="p-3 bg-muted rounded-md">
+          <div className={`p-3 rounded-md ${!allMatchesCompleted ? 'bg-destructive/10 border border-destructive/20' : 'bg-muted'}`}>
             <p className="text-sm">
-              ⚠️ <strong>Importante:</strong> Asegúrate de que todos los partidos de zona estén completados antes de generar los playoffs.
+              {!allMatchesCompleted ? (
+                <>
+                  ❌ <strong>No puedes generar playoffs:</strong> Debes completar todos los partidos de zona primero (incluyendo marcar W.O. si corresponde).
+                </>
+              ) : (
+                <>
+                  ⚠️ <strong>Importante:</strong> Asegúrate de que todos los partidos de zona estén completados antes de generar los playoffs.
+                </>
+              )}
             </p>
           </div>
         </div>
