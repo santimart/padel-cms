@@ -6,15 +6,21 @@ import { Button } from '@/components/ui/button'
 
 interface GenerateZonesButtonProps {
   tournamentId: string
+  pairsCount: number
   onSuccess?: () => void
 }
 
-export function GenerateZonesButton({ tournamentId, onSuccess }: GenerateZonesButtonProps) {
+export function GenerateZonesButton({ tournamentId, pairsCount, onSuccess }: GenerateZonesButtonProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleGenerateZones = async () => {
+    if (pairsCount < 12) {
+      setError('Se necesitan al menos 12 parejas para generar las zonas')
+      return
+    }
+
     if (!confirm('¿Estás seguro de generar las zonas? Esto cerrará las inscripciones y no se podrán agregar más parejas.')) {
       return
     }
@@ -47,6 +53,8 @@ export function GenerateZonesButton({ tournamentId, onSuccess }: GenerateZonesBu
     }
   }
 
+  const isEnoughPairs = pairsCount >= 12
+
   return (
     <div className="space-y-2">
       {error && (
@@ -54,11 +62,18 @@ export function GenerateZonesButton({ tournamentId, onSuccess }: GenerateZonesBu
           {error}
         </div>
       )}
+      
+      {!isEnoughPairs && (
+        <div className="p-3 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-md">
+          ⚠️ Se requieren al menos 12 parejas para comenzar el torneo (actual: {pairsCount})
+        </div>
+      )}
+
       <Button 
         className="w-full" 
         size="lg"
         onClick={handleGenerateZones}
-        disabled={loading}
+        disabled={loading || !isEnoughPairs}
       >
         {loading ? (
           <>

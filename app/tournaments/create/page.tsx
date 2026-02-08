@@ -89,6 +89,12 @@ export default function CreateTournamentPage() {
         return
       }
 
+      if (formData.maxPairs && parseInt(formData.maxPairs) < 12) {
+        setError('El máximo de parejas debe ser al menos 12')
+        setLoading(false)
+        return
+      }
+
       // Create tournament
       const { data: tournament, error: tournamentError } = await supabase
         .from('tournaments')
@@ -298,7 +304,7 @@ export default function CreateTournamentPage() {
                     id="maxPairs"
                     name="maxPairs"
                     type="number"
-                    min="4"
+                    min="12"
                     placeholder="Ej: 16"
                     value={formData.maxPairs}
                     onChange={handleChange}
