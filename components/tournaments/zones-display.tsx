@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { formatName } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ZoneStandings } from '@/components/tournaments/zone-standings'
@@ -146,10 +147,10 @@ export function ZonesDisplay({ tournamentId }: ZonesDisplayProps) {
                       </div>
                       <div className="flex-1">
                         <div className="font-medium text-sm">
-                          {pair.player1.first_name} {pair.player1.last_name}
+                          {formatName(pair.player1.first_name)} {formatName(pair.player1.last_name)}
                         </div>
                         <div className="font-medium text-sm">
-                          {pair.player2.first_name} {pair.player2.last_name}
+                          {formatName(pair.player2.first_name)} {formatName(pair.player2.last_name)}
                         </div>
                         {pair.player1.current_category && pair.player2.current_category && (
                           <div className="text-xs text-muted-foreground mt-1">

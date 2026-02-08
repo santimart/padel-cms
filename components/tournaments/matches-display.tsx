@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { formatName } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { EditMatchTime } from '@/components/tournaments/edit-match-time'
@@ -210,10 +211,10 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayPr
                     <div className="flex items-center gap-4">
                       <div className="flex-1">
                         <div className="font-medium text-sm">
-                          {match.pair1.player1.first_name} {match.pair1.player1.last_name} / {match.pair1.player2.first_name} {match.pair1.player2.last_name}
+                          {formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)} / {formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}
                         </div>
                         <div className="font-medium text-sm mt-1">
-                          {match.pair2.player1.first_name} {match.pair2.player1.last_name} / {match.pair2.player2.first_name} {match.pair2.player2.last_name}
+                          {formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)} / {formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}
                         </div>
                       </div>
                       <div className="text-center min-w-[60px]">
@@ -255,8 +256,8 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayPr
                   <div className="ml-4 flex items-center gap-2">
                     <MatchScorer
                       matchId={match.id}
-                      pair1Name={`${match.pair1.player1.first_name} ${match.pair1.player1.last_name} / ${match.pair1.player2.first_name} ${match.pair1.player2.last_name}`}
-                      pair2Name={`${match.pair2.player1.first_name} ${match.pair2.player1.last_name} / ${match.pair2.player2.first_name} ${match.pair2.player2.last_name}`}
+                      pair1Name={`${formatName(match.pair1.player1.first_name)} ${formatName(match.pair1.player1.last_name)} / ${formatName(match.pair1.player2.first_name)} ${formatName(match.pair1.player2.last_name)}`}
+                      pair2Name={`${formatName(match.pair2.player1.first_name)} ${formatName(match.pair2.player1.last_name)} / ${formatName(match.pair2.player2.first_name)} ${formatName(match.pair2.player2.last_name)}`}
                       pair1Id={match.pair1_id}
                       pair2Id={match.pair2_id}
                       currentStatus={match.status}

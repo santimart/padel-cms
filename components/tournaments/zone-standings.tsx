@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { formatName } from '@/lib/utils'
 import { calculateZoneStandings, formatStandingsRecord, isQualified } from '@/lib/tournament/standings-calculator'
 import type { Pair, Player } from '@/lib/types'
 
@@ -178,10 +179,10 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName }: ZoneStandingsP
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {standing.pair.player1.first_name} {standing.pair.player1.last_name}
+                      {formatName(standing.pair.player1.first_name)} {formatName(standing.pair.player1.last_name)}
                     </div>
                     <div className="text-sm">
-                      {standing.pair.player2.first_name} {standing.pair.player2.last_name}
+                      {formatName(standing.pair.player2.first_name)} {formatName(standing.pair.player2.last_name)}
                     </div>
                   </TableCell>
                   <TableCell className="text-center">{standing.matchesPlayed}</TableCell>

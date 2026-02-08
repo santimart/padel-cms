@@ -16,3 +16,12 @@ export function formatMatchTime(time: string | null) {
     minute: '2-digit'
   })
 }
+
+export function formatName(name: string | null | undefined): string {
+  if (!name) return ''
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}

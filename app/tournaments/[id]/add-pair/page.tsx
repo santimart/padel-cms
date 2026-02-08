@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Player } from '@/lib/types'
+import { formatName } from '@/lib/utils'
 
 export default function AddPairPage() {
   const params = useParams()
@@ -80,11 +81,11 @@ export default function AddPairPage() {
   const selectPlayer = (player: Player, playerNumber: 1 | 2) => {
     if (playerNumber === 1) {
       setSelectedPlayer1(player)
-      setSearchTerm1(`${player.first_name} ${player.last_name}`)
+      setSearchTerm1(`${formatName(player.first_name)} ${formatName(player.last_name)}`)
       setSearchResults1([])
     } else {
       setSelectedPlayer2(player)
-      setSearchTerm2(`${player.first_name} ${player.last_name}`)
+      setSearchTerm2(`${formatName(player.first_name)} ${formatName(player.last_name)}`)
       setSearchResults2([])
     }
   }
@@ -229,7 +230,7 @@ export default function AddPairPage() {
                             className="w-full px-4 py-3 text-left hover:bg-muted transition-colors border-b border-border last:border-0"
                           >
                             <div className="font-medium">
-                              {player.first_name} {player.last_name}
+                              {formatName(player.first_name)} {formatName(player.last_name)}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               DNI: {player.dni}
@@ -245,7 +246,7 @@ export default function AddPairPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="font-medium">
-                            {selectedPlayer1.first_name} {selectedPlayer1.last_name}
+                            {formatName(selectedPlayer1.first_name)} {formatName(selectedPlayer1.last_name)}
                           </div>
                           <div className="text-sm text-muted-foreground">
                             DNI: {selectedPlayer1.dni}
@@ -294,7 +295,7 @@ export default function AddPairPage() {
                             className="w-full px-4 py-3 text-left hover:bg-muted transition-colors border-b border-border last:border-0"
                           >
                             <div className="font-medium">
-                              {player.first_name} {player.last_name}
+                              {formatName(player.first_name)} {formatName(player.last_name)}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               DNI: {player.dni}
@@ -310,7 +311,7 @@ export default function AddPairPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="font-medium">
-                            {selectedPlayer2.first_name} {selectedPlayer2.last_name}
+                            {formatName(selectedPlayer2.first_name)} {formatName(selectedPlayer2.last_name)}
                           </div>
                           <div className="text-sm text-muted-foreground">
                             DNI: {selectedPlayer2.dni}

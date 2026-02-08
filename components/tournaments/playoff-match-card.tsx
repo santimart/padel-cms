@@ -6,7 +6,7 @@ import { Check } from "lucide-react"
 import { EditMatchTime } from "./edit-match-time"
 import { MatchScorer } from "./match-scorer"
 import { PlayoffMatch } from "@/lib/types"
-import { formatMatchTime } from "@/lib/utils"
+import { formatMatchTime, formatName } from "@/lib/utils"
 
 interface PlayoffMatchCardProps {
   match: PlayoffMatch
@@ -25,7 +25,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
       <div className="flex-1">
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium">
-             {pair.player1.first_name} {pair.player1.last_name} / {pair.player2.first_name} {pair.player2.last_name}
+             {formatName(pair.player1.first_name)} {formatName(pair.player1.last_name)} / {formatName(pair.player2.first_name)} {formatName(pair.player2.last_name)}
           </div>
         </div>
         {pair.zone && (
@@ -114,8 +114,8 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
             <div className="mt-3 pt-3 border-t">
               <MatchScorer
                 matchId={match.id}
-                pair1Name={`${match.pair1.player1.first_name} ${match.pair1.player1.last_name} / ${match.pair1.player2.first_name} ${match.pair1.player2.last_name}`}
-                pair2Name={`${match.pair2.player1.first_name} ${match.pair2.player1.last_name} / ${match.pair2.player2.first_name} ${match.pair2.player2.last_name}`}
+                pair1Name={`${formatName(match.pair1.player1.first_name)} ${formatName(match.pair1.player1.last_name)} / ${formatName(match.pair1.player2.first_name)} ${formatName(match.pair1.player2.last_name)}`}
+                pair2Name={`${formatName(match.pair2.player1.first_name)} ${formatName(match.pair2.player1.last_name)} / ${formatName(match.pair2.player2.first_name)} ${formatName(match.pair2.player2.last_name)}`}
                 pair1Id={match.pair1.id}
                 pair2Id={match.pair2.id}
                 currentStatus={match.status}

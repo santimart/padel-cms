@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import type { Player } from '@/lib/types'
+import { formatName } from '@/lib/utils'
 
 export default function PlayersPage() {
   const [players, setPlayers] = useState<Player[]>([])
@@ -162,7 +163,7 @@ export default function PlayersPage() {
                     {filteredPlayers.map((player) => (
                       <TableRow key={player.id}>
                         <TableCell className="font-medium">
-                          {player.first_name} {player.last_name}
+                          {formatName(player.first_name)} {formatName(player.last_name)}
                         </TableCell>
                         <TableCell>{player.dni}</TableCell>
                         <TableCell>{player.email || '-'}</TableCell>
