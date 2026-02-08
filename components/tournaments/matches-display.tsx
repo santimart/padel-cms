@@ -82,6 +82,7 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayPr
           )
         `)
         .eq('tournament_id', tournamentId)
+        .eq('phase', 'zones')
         .order('zone_id', { ascending: true })
         .order('match_number', { ascending: true })
 

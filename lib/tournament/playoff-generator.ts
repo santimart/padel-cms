@@ -180,17 +180,44 @@ export function createBracket(qualified: QualifiedPair[]): BracketMatch[] {
   const matches: BracketMatch[] = []
   const matchesNeeded = totalPairs / 2
   
+  // Available runners-up pool
+  const availableRunners = [...shuffledRunners]
+
   for (let i = 0; i < matchesNeeded; i++) {
-    const pair1 = shuffledWinners[i] || shuffledRunners[i - winners.length]
-    const pair2 = shuffledRunners[i] || shuffledWinners[i - runnersUp.length]
+    const winner = shuffledWinners[i]
+    
+    // If we run out of winners (e.g. odd number, though should be power of 2 with byes), handle gracefully
+    // But logic assumes power of 2 from qualified pairs
+    
+    let runnerUpIndex = -1
+    let runnerUp: QualifiedPair | undefined
+
+    if (winner) {
+      // Try to find a runner-up from a different zone
+      runnerUpIndex = availableRunners.findIndex(r => r.zoneId !== winner.zoneId)
+    }
+
+    // If no runner-up from different zone found (or no winner to match against), take the first one
+    if (runnerUpIndex === -1 && availableRunners.length > 0) {
+      runnerUpIndex = 0
+    }
+
+    if (runnerUpIndex !== -1) {
+      runnerUp = availableRunners[runnerUpIndex]
+      // Remove used runner-up
+      availableRunners.splice(runnerUpIndex, 1)
+    }
+
+    // Fallback if we have more matches than winner/runner pairs (e.g. byes logic might be needed upstream, 
+    // but here we just pair what we have. If qualified is odd, this logic might need adjustment but assuming even for now)
     
     matches.push({
       round: firstRound,
       bracketPosition: i + 1,
-      pair1Id: pair1?.pairId || null,
-      pair2Id: pair2?.pairId || null,
-      pair1Zone: pair1?.zoneName,
-      pair2Zone: pair2?.zoneName,
+      pair1Id: winner?.pairId || null,
+      pair2Id: runnerUp?.pairId || null,
+      pair1Zone: winner?.zoneName,
+      pair2Zone: runnerUp?.zoneName,
     })
   }
   
