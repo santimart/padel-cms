@@ -8,6 +8,7 @@ import { formatName } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { ExternalLink } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import { GenerateZonesButton } from '@/components/tournaments/generate-zones-button'
@@ -198,7 +199,7 @@ export default function TournamentDetailPage() {
               <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
                 <span>{tournament.complexes.name}</span>
                 <span>•</span>
-                <span>{getCategoryName(tournament.category)}</span>
+                <span>{tournament.category ? getCategoryName(tournament.category) : 'Sin categoría'}</span>
                 <span>•</span>
                 <span>{tournament.gender}</span>
                 {tournament.start_date && (
@@ -210,6 +211,12 @@ export default function TournamentDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" asChild className="hidden sm:flex">
+                <Link href={`/live/${tournamentId}`} target="_blank">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Modo TV (En Vivo)
+                </Link>
+              </Button>
               {getStatusBadge(tournament.status)}
             </div>
           </div>

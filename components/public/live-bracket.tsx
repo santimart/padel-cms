@@ -1,0 +1,134 @@
+'use client'
+
+import { Card, CardContent } from "@/components/ui/card"
+import { formatName } from "@/lib/utils"
+import { MatchDetailed } from "@/lib/types"
+
+interface LiveBracketProps {
+  matches: MatchDetailed[]
+}
+
+const ROUND_LABELS: Record<string, string> = {
+  'R32': '32avos',
+  'R16': 'Octavos',
+  'QF': 'Cuartos',
+  'SF': 'Semis',
+  'F': 'Final',
+}
+
+const ROUND_ORDER = ['R32', 'R16', 'QF', 'SF', 'F']
+
+export function LiveBracket({ matches }: LiveBracketProps) {
+  // Identify rounds present
+  const playoffMatches = matches.filter(m => m.phase === 'playoffs')
+  const presentRounds = Array.from(new Set(playoffMatches.map(m => m.round))).filter(Boolean) as string[]
+  
+  const sortedRounds = presentRounds.sort((a, b) => {
+    return ROUND_ORDER.indexOf(a) - ROUND_ORDER.indexOf(b)
+  })
+
+  // We need to render columns for each round
+  // This is a simplified bracket view. For a true tree we need canvas or complex CSS grid.
+  // For now, let's use flex columns which is readable enough on TV.
+
+  return (
+    <div className="flex gap-12 p-4 overflow-x-auto min-w-full min-h-full">
+      {sortedRounds.map(round => {
+        // Sort matches by bracket_position
+        const roundMatches = playoffMatches
+          .filter(m => m.round === round)
+          .sort((a, b) => (a.bracket_position || 0) - (b.bracket_position || 0))
+        
+        return (
+          <div key={round} className="min-w-[300px] flex flex-col gap-4">
+             <div className="text-center py-2 bg-primary/10 rounded font-bold text-xl uppercase tracking-widest text-primary sticky top-0 z-10 backdrop-blur-sm shadow-sm">
+               {ROUND_LABELS[round] || round}
+             </div>
+             
+             <div className="flex flex-col justify-around flex-1 py-4 gap-8">
+               {roundMatches.map(match => (
+                 <LiveBracketMatch key={match.id} match={match} />
+               ))}
+             </div>
+          </div>
+        )
+      })}
+      
+      {sortedRounds.length === 0 && (
+          <div className="w-full flex items-center justify-center text-muted-foreground text-xl">
+              El cuadro de playoffs aún no se ha generado.
+          </div>
+      )}
+    </div>
+  )
+}
+
+function LiveBracketMatch({ match }: { match: MatchDetailed }) {
+  const winnerId = match.winner_id
+  const p1Lost = winnerId && winnerId !== match.pair1_id
+  const p2Lost = winnerId && winnerId !== match.pair2_id
+  
+  // Cast games to number[]
+  const p1Games = (match.pair1_games as number[]) || []
+  const p2Games = (match.pair2_games as number[]) || []
+
+  return (
+    <Card className="border-border shadow-sm min-w-[280px]">
+      <CardContent className="p-3">
+        {/* Pair 1 */}
+        <div className={`flex justify-between items-center p-2 rounded ${winnerId === match.pair1_id ? 'bg-green-500/10' : ''} ${p1Lost ? 'opacity-50' : ''}`}>
+           <div className={`text-sm font-bold truncate flex-1 pr-2 ${winnerId === match.pair1_id ? 'text-green-500' : ''}`}>
+               {match.pair1 ? (
+                   <span className="flex flex-col">
+                    <span>{formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)}</span>
+                    <span>{formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}</span>
+                   </span>
+               ) : 'A definir'}
+           </div>
+           
+           <div className="flex items-center gap-3">
+             <div className="flex gap-4 text-white font-mono text-lg font-bold">
+                {p1Games.map((g, i) => (
+                  <span key={i}>{g}</span>
+                ))}
+             </div>
+             {/* {match.pair1_sets !== null && <span className="font-mono font-bold text-lg">{match.pair1_sets}</span>} */}
+           </div>
+        </div>
+
+        <div className="h-px bg-border my-1"></div>
+
+        {/* Pair 2 */}
+        <div className={`flex justify-between items-center p-2 rounded ${winnerId === match.pair2_id ? 'bg-green-500/10' : ''} ${p2Lost ? 'opacity-50' : ''}`}>
+           <div className={`text-sm font-bold truncate flex-1 pr-2 ${winnerId === match.pair2_id ? 'text-green-500' : ''}`}>
+                {match.pair2 ? (
+                   <span className="flex flex-col">
+                    <span>{formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)}</span>
+                    <span>{formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}</span>
+                   </span>
+               ) : 'A definir'}
+           </div>
+           
+           <div className="flex items-center gap-3">
+             <div className="flex gap-4 text-white font-mono text-lg font-bold">
+                {p2Games.map((g, i) => (
+                  <span key={i}>{g}</span>
+                ))}
+             </div>
+             {/* {match.pair2_sets !== null && <span className="font-mono font-bold text-lg">{match.pair2_sets}</span>} */}
+           </div>
+        </div>
+        
+        <div className="text-xs text-center mt-1 text-muted-foreground">
+             {match.zone?.name ? `Zona ${match.zone.name}` : ''}
+             {/* {match.round && !match.zone && <span className="uppercase">{ROUND_LABELS[match.round] || match.round}</span>} */}
+              {match.scheduled_time && !match.winner_id && (
+                  <span className="ml-1">
+                      • {new Date(match.scheduled_time).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'})}
+                  </span>
+              )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

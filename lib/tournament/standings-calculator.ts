@@ -1,16 +1,4 @@
-import type { Pair } from '@/lib/types'
-
-interface Match {
-  id: string
-  pair1_id: string
-  pair2_id: string
-  pair1_sets: number
-  pair2_sets: number
-  pair1_games: number[] | null
-  pair2_games: number[] | null
-  winner_id: string | null
-  status: string
-}
+import type { Pair, Match, PairWithPlayers } from '@/lib/types'
 
 interface PairStats {
   pairId: string
@@ -28,7 +16,7 @@ interface PairStats {
 
 interface Standing extends PairStats {
   position: number
-  pair: Pair
+  pair: PairWithPlayers
 }
 
 /**
@@ -47,7 +35,7 @@ interface Standing extends PairStats {
  * 5. Sorteo
  */
 export function calculateZoneStandings(
-  pairs: Pair[],
+  pairs: PairWithPlayers[],
   matches: Match[]
 ): Standing[] {
   // Calculate stats for each pair
@@ -72,6 +60,7 @@ export function calculateZoneStandings(
   // Process each match
   matches.forEach(match => {
     if (match.status !== 'completed' && match.status !== 'walkover') return
+    if (!match.pair1_id || !match.pair2_id) return
 
     const pair1Stats = statsMap.get(match.pair1_id)
     const pair2Stats = statsMap.get(match.pair2_id)
@@ -90,8 +79,12 @@ export function calculateZoneStandings(
 
     // Update games
     if (match.pair1_games && match.pair2_games) {
-      const pair1TotalGames = match.pair1_games.reduce((sum, g) => sum + g, 0)
-      const pair2TotalGames = match.pair2_games.reduce((sum, g) => sum + g, 0)
+      // Cast Json to number[]
+      const p1Games = match.pair1_games as number[]
+      const p2Games = match.pair2_games as number[]
+      
+      const pair1TotalGames = p1Games.reduce((sum, g) => sum + g, 0)
+      const pair2TotalGames = p2Games.reduce((sum, g) => sum + g, 0)
       
       pair1Stats.gamesWon += pair1TotalGames
       pair1Stats.gamesLost += pair2TotalGames

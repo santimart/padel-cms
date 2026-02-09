@@ -61,6 +61,19 @@ export interface ZoneStanding {
   gamesAgainst: number
 }
 
+// Detailed types for Public View (deeply nested relations)
+export interface PairDetailed extends Pair {
+  player1: Player
+  player2: Player
+  zone?: Zone | null
+}
+
+export interface MatchDetailed extends Match {
+  pair1: PairDetailed | null
+  pair2: PairDetailed | null
+  zone?: Zone | null
+}
+
 // Tournament categories
 export const CATEGORIES = [1, 2, 3, 4, 5, 6, 7] as const
 export type Category = typeof CATEGORIES[number]
