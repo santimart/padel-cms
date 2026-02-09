@@ -16,7 +16,13 @@ export default async function LiveTournamentPage({ params }: LivePageProps) {
   // Fetch tournament details
   const { data: tournament } = await supabase
     .from('tournaments')
-    .select('name') // Only need name for the layout
+    .select(`
+      name,
+      complexes (
+        name,
+        logo_url
+      )
+    `)
     .eq('id', id)
     .single()
 

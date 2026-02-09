@@ -9,6 +9,10 @@ import { Button } from '@/components/ui/button'
 interface LiveLayoutProps {
   tournament: {
     name: string
+    complexes: {
+      name: string
+      logo_url: string | null
+    } | null
   }
   children: React.ReactNode
 }
@@ -52,12 +56,25 @@ export function LiveLayout({ tournament, children }: LiveLayoutProps) {
       {!isFullscreen && (
         <header className="flex items-center justify-between px-6 py-4 bg-card border-b border-border/40 shadow-sm z-10 transition-all duration-300">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="text-3xl font-bold text-primary-foreground">P</span>
-            </div>
+            {tournament.complexes?.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img 
+                src={tournament.complexes.logo_url} 
+                alt={tournament.complexes.name} 
+                className="h-12 w-12 rounded-xl object-cover bg-muted shadow-lg shadow-primary/20"
+              />
+            ) : (
+                <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <span className="text-3xl font-bold text-primary-foreground">
+                    {tournament.complexes?.name ? tournament.complexes.name.charAt(0).toUpperCase() : 'P'}
+                  </span>
+                </div>
+            )}
             <div>
               <h1 className="text-2xl font-bold tracking-tight">{tournament.name}</h1>
-              <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">Tournament Live View</p>
+              <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
+                {tournament.complexes?.name || 'Tournament Live View'}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-6">

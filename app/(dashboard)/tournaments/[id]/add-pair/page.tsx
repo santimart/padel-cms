@@ -160,21 +160,7 @@ export default function AddPairPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/40 bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-foreground">P</span>
-            </div>
-            <span className="text-xl font-bold">Padel Manager</span>
-          </Link>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+    <>
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
             <Link
@@ -360,7 +346,6 @@ export default function AddPairPage() {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+    </>
   )
 }

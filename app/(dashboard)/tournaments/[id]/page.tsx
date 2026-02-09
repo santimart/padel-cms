@@ -152,62 +152,25 @@ export default function TournamentDetailPage() {
   }
 
   if (error || !tournament) {
-     // ... same error ...
-     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border/40 bg-card">
-          <div className="container mx-auto px-4 py-4">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="text-xl font-bold">Padel Manager</span>
-            </Link>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 py-8">
-          <Card className="max-w-2xl mx-auto">
-            <CardContent className="pt-6 text-center">
-              <h2 className="text-2xl font-bold mb-4">Torneo no encontrado</h2>
-              <p className="text-muted-foreground mb-6">{error || 'El torneo que buscas no existe'}</p>
-              <Button asChild>
-                <Link href="/dashboard">Volver al Dashboard</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </main>
+    return (
+      <div className="max-w-2xl mx-auto mt-8">
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <h2 className="text-2xl font-bold mb-4">Torneo no encontrado</h2>
+            <p className="text-muted-foreground mb-6">{error || 'El torneo que buscas no existe'}</p>
+            <Button asChild>
+              <Link href="/dashboard">Volver al Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/40 bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="text-xl font-bold">Padel Manager</span>
-            </Link>
-          </div>
-          <nav className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link href="/tournaments">Torneos</Link>
-            </Button>
-          </nav>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Tournament Header */}
-        <div className="mb-8">
+    <>
+      {/* Tournament Header */}
+      <div className="mb-8">
           <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
             ← Volver al dashboard
           </Link>
@@ -465,8 +428,7 @@ export default function TournamentDetailPage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+    </>
   )
 }
 
