@@ -150,7 +150,7 @@ function LiveMatchCard({ match, status }: { match: MatchDetailed, status: 'playi
   const setsCount = Math.max(pair1Games.length, pair2Games.length)
 
   return (
-    <Card className={`overflow-hidden ${isPlaying ? 'border-primary border-2 shadow-lg shadow-primary/10' : 'border-border'}`}>
+    <Card className={`overflow-hidden p-0 ${isPlaying ? 'border-primary border-2 shadow-lg shadow-primary/10' : 'border-border'}`}>
       <CardContent className="p-6">
         <div className="flex justify-between items-center mb-4">
            <div className="flex flex-col gap-1">

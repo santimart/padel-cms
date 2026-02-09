@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
+import { UploadCloud } from 'lucide-react'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -18,6 +19,7 @@ export default function RegisterPage() {
     complexName: '',
     location: '',
   })
+  const [logoFile, setLogoFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -26,6 +28,26 @@ export default function RegisterPage() {
       ...formData,
       [e.target.name]: e.target.value,
     })
+  }
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validation
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      setError('Formato de imagen no válido. Use JPG, PNG o WEBP.')
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) { // 2MB
+      setError('El tamaño de la imagen no debe superar los 2MB.')
+      return
+    }
+
+    setError('')
+    setLogoFile(file)
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -65,7 +87,7 @@ export default function RegisterPage() {
       await new Promise(resolve => setTimeout(resolve, 500))
 
       // 3. Create complex for this user using the database function
-      const { data: complexData, error: complexError } = await supabase
+      const { data: complexId, error: complexError } = await supabase
         .rpc('create_complex_for_user', {
           user_id: authData.user.id,
           complex_name: formData.complexName,
@@ -74,8 +96,39 @@ export default function RegisterPage() {
 
       if (complexError) {
         console.error('Error creating complex:', complexError)
-        // If complex creation fails, we can still proceed
-        // The user can create it later from the dashboard
+        // If complex creation fails, we can still proceed? No, that's critical.
+        // But maybe user created, complex failed. 
+        throw new Error('Error al crear el complejo: ' + complexError.message)
+      }
+
+      // 4. Upload Logo if exists
+      if (logoFile && complexId) {
+        try {
+          const fileExt = logoFile.name.split('.').pop()
+          const fileName = `${complexId}/logo-${Date.now()}.${fileExt}`
+
+          const { error: uploadError } = await supabase.storage
+            .from('complex-logos')
+            .upload(fileName, logoFile)
+
+          if (uploadError) {
+             console.error('Error uploading logo:', uploadError)
+             // Don't block registration if logo upload fails, just log it
+          } else {
+             // Get public URL
+             const { data: { publicUrl } } = supabase.storage
+               .from('complex-logos')
+               .getPublicUrl(fileName)
+
+             // Update complex with logo_url
+             await supabase
+               .from('complexes')
+               .update({ logo_url: publicUrl })
+               .eq('id', complexId)
+          }
+        } catch (uploadErr) {
+           console.error('Logo upload exception:', uploadErr)
+        }
       }
 
       // Success - redirect to dashboard
@@ -133,6 +186,39 @@ export default function RegisterPage() {
                   required
                   disabled={loading}
                 />
+              </div>
+
+               <div className="space-y-2">
+                <Label htmlFor="logo">Logo (Opcional)</Label>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Input
+                        id="logo"
+                        name="logo"
+                        type="file"
+                        accept="image/png, image/jpeg, image/webp"
+                        onChange={handleLogoChange}
+                        disabled={loading}
+                        className="cursor-pointer file:cursor-pointer file:text-primary file:font-semibold file:bg-primary/10 file:rounded-full file:border-0 file:mr-4 file:px-4 file:py-1 hover:file:bg-primary/20"
+                      />
+                      <UploadCloud className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Max 2MB. Formatos: PNG, JPG, WEBP
+                    </p>
+                  </div>
+                   {logoFile && (
+                    <div className="h-10 w-10 relative bg-muted rounded border overflow-hidden shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={URL.createObjectURL(logoFile)} 
+                          alt="Preview" 
+                          className="h-full w-full object-cover"
+                        />
+                    </div>
+                   )}
+                </div>
               </div>
 
               <div className="space-y-2">
