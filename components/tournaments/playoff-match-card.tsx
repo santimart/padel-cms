@@ -18,24 +18,19 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
   const pair1Won = match.winner_id === match.pair1_id && match.pair1_id !== null
   const pair2Won = match.winner_id === match.pair2_id && match.pair2_id !== null
 
-  const renderPairName = (pair: PlayoffMatch['pair1']) => {
-    if (!pair) return <div className="text-sm text-muted-foreground">TBD</div>
-    
-    return (
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <div className="text-sm font-medium">
-             {formatName(pair.player1.first_name)} {formatName(pair.player1.last_name)} / {formatName(pair.player2.first_name)} {formatName(pair.player2.last_name)}
-          </div>
-        </div>
-        {pair.zone && (
-          <Badge variant="outline" className="text-xs mt-1">
-            {pair.zone.name}
-          </Badge>
-        )}
-      </div>
-    )
+  // Helper to get games array safely
+  const getGames = (gamesData: any): number[] => {
+    try {
+      if (!gamesData) return []
+      return typeof gamesData === 'string' ? JSON.parse(gamesData) : gamesData
+    } catch {
+      return []
+    }
   }
+
+  const p1Games = getGames(match.pair1_games)
+  const p2Games = getGames(match.pair2_games)
+  const setsCount = Math.max(p1Games.length, p2Games.length)
 
   return (
       <Card className="mb-3">
@@ -60,54 +55,67 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
 
           {/* Pair 1 */}
           <div className={`flex items-center gap-3 p-2 rounded ${pair1Won ? 'bg-primary/5' : ''}`}>
-             {renderPairName(match.pair1)}
-             <div className="flex items-center gap-2">
-              {isCompleted && match.pair1_sets !== undefined && (
-                <span className="text-lg font-bold min-w-[20px] text-center">
-                  {match.pair1_sets}
-                </span>
-              )}
-              {pair1Won && <Check className="h-4 w-4 text-primary" />}
-            </div>
+             <div className="flex-1">
+                {match.pair1 ? (
+                   <div className="flex flex-col">
+                     <span className="font-medium">
+                        {formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)} / {formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}
+                     </span>
+                     {match.pair1.zone?.name && (
+                       <Badge variant="outline" className="w-fit mt-1 text-[10px] h-5 px-1.5">
+                         Zona {match.pair1.zone.name}
+                       </Badge>
+                     )}
+                   </div>
+                ) : (
+                  <span className="text-sm text-muted-foreground italic">Por definir</span>
+                )}
+             </div>
+             
+             {isCompleted && (
+               <div className="flex items-center gap-1">
+                 {Array.from({ length: setsCount }).map((_, i) => (
+                    <span key={i} className={`font-mono font-bold text-sm px-2 py-0.5 rounded text-center min-w-[24px] ${
+                      (p1Games[i] > p2Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                    }`}>
+                      {p1Games[i] ?? '-'}
+                    </span>
+                 ))}
+               </div>
+             )}
           </div>
           
           {/* Pair 2 */}
            <div className={`flex items-center gap-3 p-2 rounded mt-1 ${pair2Won ? 'bg-primary/5' : ''}`}>
-             {renderPairName(match.pair2)}
-             <div className="flex items-center gap-2">
-              {isCompleted && match.pair2_sets !== undefined && (
-                 <span className="text-lg font-bold min-w-[20px] text-center">
-                   {match.pair2_sets}
-                 </span>
-               )}
-               {pair2Won && <Check className="h-4 w-4 text-primary" />}
+             <div className="flex-1">
+                 {match.pair2 ? (
+                   <div className="flex flex-col">
+                     <span className="font-medium">
+                        {formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)} / {formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}
+                     </span>
+                     {match.pair2.zone?.name && (
+                       <Badge variant="outline" className="w-fit mt-1 text-[10px] h-5 px-1.5">
+                         Zona {match.pair2.zone.name}
+                       </Badge>
+                     )}
+                   </div>
+                ) : (
+                  <span className="text-sm text-muted-foreground italic">Por definir</span>
+                )}
              </div>
+
+             {isCompleted && (
+               <div className="flex items-center gap-1">
+                 {Array.from({ length: setsCount }).map((_, i) => (
+                    <span key={i} className={`font-mono font-bold text-sm px-2 py-0.5 rounded text-center min-w-[24px] ${
+                      (p2Games[i] > p1Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                    }`}>
+                      {p2Games[i] ?? '-'}
+                    </span>
+                 ))}
+               </div>
+             )}
           </div>
-          
-           {/* Detailed scores */}
-           {/* Note: In DB types Json, we need to handle parsing if string or array */}
-           {isCompleted && match.pair1_games && match.pair2_games && (
-            <div className="text-xs text-muted-foreground mt-2 text-center">
-              {(() => {
-                try {
-                  const p1Games = typeof match.pair1_games === 'string' 
-                    ? JSON.parse(match.pair1_games as string) 
-                    : match.pair1_games
-                  const p2Games = typeof match.pair2_games === 'string'
-                    ? JSON.parse(match.pair2_games as string)
-                    : match.pair2_games
-                  
-                  if (Array.isArray(p1Games) && Array.isArray(p2Games)) {
-                    return `(${p1Games.map((p1: any, idx: number) => 
-                      `${p1}-${p2Games[idx]}`
-                    ).join(', ')})`
-                  }
-                } catch (e) {
-                  return null
-                }
-              })()}
-            </div>
-          )}
 
            {/* Actions / Match Scorer */}
           {!isCompleted && match.pair1 && match.pair2 && (
