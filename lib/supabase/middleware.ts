@@ -40,10 +40,13 @@ export async function updateSession(request: NextRequest) {
   // Public routes (accessible without login) - excluding root which has special handling
   const publicRoutes = [
     '/register-player/public',
+    '/register-player/qr', // Assuming QR page might also need to be public or it redirects to public
+    '/live',
   ]
   
-  // Auth routes (login, register, etc.) - should redirect to dashboard if already logged in
-  const isAuthRoute = path.startsWith('/login') || path.startsWith('/register')
+  // Auth routes (login, register via auth, etc.) - should redirect to dashboard if already logged in
+  // Exclude /register-player from auth routes check
+  const isAuthRoute = path.startsWith('/login') || (path.startsWith('/register') && !path.startsWith('/register-player'))
   
   const isPublicRoute = publicRoutes.some(route => path === route || path.startsWith(route))
   

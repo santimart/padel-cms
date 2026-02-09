@@ -23,6 +23,25 @@ export default function PublicRegisterPlayerPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [captcha, setCaptcha] = useState<{ a: number; b: number; answer: string }>({ a: 0, b: 0, answer: '' })
+  const [captchaInput, setCaptchaInput] = useState('')
+
+  // Generate simple math captcha on load
+  const generateCaptcha = () => {
+    const a = Math.floor(Math.random() * 10) + 1
+    const b = Math.floor(Math.random() * 10) + 1
+    setCaptcha({ a, b, answer: (a + b).toString() })
+    setCaptchaInput('')
+  }
+  
+  // UseEffect to easier handling on client only
+  const [mounted, setMounted] = useState(false)
+  if (!mounted) {
+      if (typeof window !== 'undefined') {
+          setMounted(true)
+          generateCaptcha()
+      }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -36,6 +55,14 @@ export default function PublicRegisterPlayerPage() {
     setLoading(true)
     setError('')
     setSuccess(false)
+
+    // Verify Captcha
+    if (captchaInput !== captcha.answer) {
+        setError('La respuesta de seguridad es incorrecta. Por favor intenta nuevamente.')
+        generateCaptcha()
+        setLoading(false)
+        return
+    }
 
     try {
       const supabase = createClient()
@@ -61,7 +88,7 @@ export default function PublicRegisterPlayerPage() {
         email: formData.email || null,
         phone: formData.phone || null,
         current_category: formData.category ? parseInt(formData.category) : null,
-      })
+      } as any)
 
       if (insertError) throw insertError
 
@@ -76,6 +103,7 @@ export default function PublicRegisterPlayerPage() {
         phone: '',
         category: '',
       })
+      generateCaptcha()
 
       // Hide success message after 5 seconds
       setTimeout(() => {
@@ -220,6 +248,33 @@ export default function PublicRegisterPlayerPage() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Bot Protection / Captcha */}
+              <div className="p-4 bg-secondary/20 rounded-lg border border-border">
+                  <Label htmlFor="captcha" className="block mb-2 font-medium">Pregunta de Seguridad *</Label>
+                  <div className="flex items-center gap-3">
+                      <div className="bg-secondary px-4 py-2 rounded font-mono font-bold text-lg select-none">
+                          {captcha.a} + {captcha.b} = ?
+                      </div>
+                      <Input
+                          id="captcha"
+                          name="captcha"
+                          type="number"
+                          placeholder="Respuesta"
+                          value={captchaInput}
+                          onChange={(e) => setCaptchaInput(e.target.value)}
+                          required
+                          disabled={loading}
+                          className="h-11 w-24 text-center font-bold"
+                      />
+                      <Button type="button" variant="ghost" size="icon" onClick={generateCaptcha} title="Nueva pregunta">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+                      </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                      Por favor resuelve la suma para verificar que eres humano.
+                  </p>
               </div>
 
               <Button type="submit" className="w-full h-12 text-lg mt-6" disabled={loading}>

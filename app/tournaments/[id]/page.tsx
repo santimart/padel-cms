@@ -17,6 +17,7 @@ import { DeletePairButton } from '@/components/tournaments/delete-pair-button'
 import { ZonesDisplay } from '@/components/tournaments/zones-display'
 import { MatchesDisplay } from '@/components/tournaments/matches-display'
 import { PlayoffBracket } from '@/components/tournaments/playoff-bracket'
+import { TournamentQRDialog } from '@/components/tournament/tournament-qr-dialog'
 import type { Tournament, Pair, Player } from '@/lib/types'
 
 type TournamentWithComplex = Tournament & {
@@ -211,6 +212,10 @@ export default function TournamentDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <TournamentQRDialog 
+                tournamentId={tournamentId} 
+                tournamentName={tournament.name} 
+              />
               <Button variant="outline" size="sm" asChild className="hidden sm:flex">
                 <Link href={`/live/${tournamentId}`} target="_blank">
                   <ExternalLink className="mr-2 h-4 w-4" />

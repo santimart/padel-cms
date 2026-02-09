@@ -7,7 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 
+import { useRouter } from 'next/navigation'
+
 export default function DashboardPage() {
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -23,7 +33,7 @@ export default function DashboardPage() {
             <Button variant="ghost" asChild>
               <Link href="/">Inicio</Link>
             </Button>
-            <Button variant="outline">Cerrar Sesión</Button>
+            <Button variant="outline" onClick={handleSignOut}>Cerrar Sesión</Button>
           </nav>
         </div>
       </header>
