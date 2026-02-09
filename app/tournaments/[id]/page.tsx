@@ -17,6 +17,7 @@ import { DeletePairButton } from '@/components/tournaments/delete-pair-button'
 import { ZonesDisplay } from '@/components/tournaments/zones-display'
 import { MatchesDisplay } from '@/components/tournaments/matches-display'
 import { PlayoffBracket } from '@/components/tournaments/playoff-bracket'
+import { RegistrationsDisplay } from '@/components/tournaments/registrations-display'
 import { TournamentQRDialog } from '@/components/tournament/tournament-qr-dialog'
 import type { Tournament, Pair, Player } from '@/lib/types'
 
@@ -124,7 +125,22 @@ export default function TournamentDetailPage() {
     return <Badge variant={config.variant}>{config.label}</Badge>
   }
 
+  // Calculate registration stats
+  const totalPlayers = pairs.length * 2
+  const paidPlayers = pairs.reduce((acc, pair) => {
+    return acc + (pair.player1_paid ? 1 : 0) + (pair.player2_paid ? 1 : 0)
+  }, 0)
+  const participationPercentage = totalPlayers > 0 ? Math.round((paidPlayers / totalPlayers) * 100) : 0
+  
+  // Define color for the indicator based on percentage
+  const getProgressColor = (percent: number) => {
+    if (percent === 100) return 'bg-green-500'
+    if (percent >= 50) return 'bg-yellow-500'
+    return 'bg-red-500'
+  }
+
   if (loading) {
+    // ... same loading ...
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -136,7 +152,8 @@ export default function TournamentDetailPage() {
   }
 
   if (error || !tournament) {
-    return (
+     // ... same error ...
+     return (
       <div className="min-h-screen bg-background">
         <header className="border-b border-border/40 bg-card">
           <div className="container mx-auto px-4 py-4">
@@ -244,6 +261,13 @@ export default function TournamentDetailPage() {
                 Playoffs
               </TabsTrigger>
             )}
+            <TabsTrigger value="registrations" className="flex items-center gap-2">
+              Inscripciones
+              <div 
+                className={`h-2 w-2 rounded-full ${getProgressColor(participationPercentage)}`} 
+                title={`${participationPercentage}% pagado`}
+              />
+            </TabsTrigger>
             <TabsTrigger value="settings">
               Configuración
             </TabsTrigger>
@@ -390,6 +414,14 @@ export default function TournamentDetailPage() {
               </Card>
             </TabsContent>
           )}
+
+          {/* Registrations Tab */}
+          <TabsContent value="registrations">
+            <RegistrationsDisplay 
+              tournamentId={tournamentId} 
+              registrationPrice={tournament.registration_price || 0} 
+            />
+          </TabsContent>
 
           {/* Settings Tab */}
           <TabsContent value="settings">

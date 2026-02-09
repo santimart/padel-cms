@@ -111,6 +111,7 @@ export interface Database {
           daily_end_time: string | null
           match_duration_minutes: number | null
           available_courts: number | null
+          registration_price: number
           created_at: string
           updated_at: string
         }
@@ -128,6 +129,7 @@ export interface Database {
           daily_end_time?: string | null
           match_duration_minutes?: number | null
           available_courts?: number | null
+          registration_price?: number
           created_at?: string
           updated_at?: string
         }
@@ -145,6 +147,7 @@ export interface Database {
           daily_end_time?: string | null
           match_duration_minutes?: number | null
           available_courts?: number | null
+          registration_price?: number
           created_at?: string
           updated_at?: string
         }
@@ -158,6 +161,8 @@ export interface Database {
           zone_id: string | null
           has_bye: boolean
           seed: number | null
+          player1_paid: boolean
+          player2_paid: boolean
           created_at: string
         }
         Insert: {
@@ -168,6 +173,8 @@ export interface Database {
           zone_id?: string | null
           has_bye?: boolean
           seed?: number | null
+          player1_paid?: boolean
+          player2_paid?: boolean
           created_at?: string
         }
         Update: {
@@ -178,6 +185,8 @@ export interface Database {
           zone_id?: string | null
           has_bye?: boolean
           seed?: number | null
+          player1_paid?: boolean
+          player2_paid?: boolean
           created_at?: string
         }
       }

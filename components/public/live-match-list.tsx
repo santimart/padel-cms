@@ -78,6 +78,22 @@ function LiveMatchCard({ match, status }: { match: MatchDetailed, status: 'playi
   const isPlaying = status === 'playing'
   const isFinished = status === 'finished'
 
+  // Helper to get games array safely
+  const getGames = (gamesData: any): number[] => {
+    try {
+      if (!gamesData) return []
+      return typeof gamesData === 'string' ? JSON.parse(gamesData) : gamesData
+    } catch {
+      return []
+    }
+  }
+
+  const pair1Games = getGames(match.pair1_games)
+  const pair2Games = getGames(match.pair2_games)
+  
+  // Determine how many sets to show (max of p1 or p2 length)
+  const setsCount = Math.max(pair1Games.length, pair2Games.length)
+
   return (
     <Card className={`overflow-hidden ${isPlaying ? 'border-primary border-2 shadow-lg shadow-primary/10' : 'border-border'}`}>
       <CardContent className="p-6">
@@ -85,7 +101,7 @@ function LiveMatchCard({ match, status }: { match: MatchDetailed, status: 'playi
            <div className="flex flex-col gap-1">
              <div className="flex gap-2">
                 <div className="text-sm font-medium text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full uppercase tracking-wider">
-                    {match.zone?.name || match.round || 'Partido'}
+                    {match.zone?.name ? `Zona ${match.zone.name}` : (match.round || 'Partido')}
                 </div>
                 {match.scheduled_time && (
                     <div className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full flex items-center gap-1">
@@ -113,10 +129,14 @@ function LiveMatchCard({ match, status }: { match: MatchDetailed, status: 'playi
              <div className="flex gap-2">
                  {(match.status === 'completed' || match.status === 'in_progress') && (
                      <div className="flex gap-1 text-2xl font-mono font-bold">
-                        {/* Logic to display sets/games. Simple sets for now */}
-                        {match.pair1_sets !== null && (
-                            <span className="bg-secondary px-3 py-1 rounded min-w-[40px] text-center">{match.pair1_sets}</span>
-                        )}
+                        {/* Show games for each set */}
+                        {Array.from({ length: setsCount }).map((_, i) => (
+                           <span key={i} className={`px-3 py-1 rounded min-w-[40px] text-center ${
+                             (pair1Games[i] > pair2Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                           }`}>
+                             {pair1Games[i] ?? '-'}
+                           </span>
+                        ))}
                      </div>
                  )}
              </div>
@@ -133,9 +153,14 @@ function LiveMatchCard({ match, status }: { match: MatchDetailed, status: 'playi
              <div className="flex gap-2">
                  {(match.status === 'completed' || match.status === 'in_progress') && (
                      <div className="flex gap-1 text-2xl font-mono font-bold">
-                        {match.pair2_sets !== null && (
-                            <span className="bg-secondary px-3 py-1 rounded min-w-[40px] text-center">{match.pair2_sets}</span>
-                        )}
+                        {/* Show games for each set */}
+                         {Array.from({ length: setsCount }).map((_, i) => (
+                           <span key={i} className={`px-3 py-1 rounded min-w-[40px] text-center ${
+                             (pair2Games[i] > pair1Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                           }`}>
+                             {pair2Games[i] ?? '-'}
+                           </span>
+                        ))}
                      </div>
                  )}
              </div>

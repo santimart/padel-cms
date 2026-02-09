@@ -27,6 +27,7 @@ export default function CreateTournamentPage() {
     dailyEndTime: '21:00',
     matchDuration: '60',
     availableCourts: '2',
+    registrationPrice: '0',
   })
   const [loading, setLoading] = useState(false)
   const [loadingComplexes, setLoadingComplexes] = useState(true)
@@ -59,7 +60,7 @@ export default function CreateTournamentPage() {
       if (data && data.length === 1) {
         setFormData(prev => ({ ...prev, complexId: data[0].id }))
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading complexes:', error)
       setError('Error al cargar tus complejos')
     } finally {
@@ -110,6 +111,7 @@ export default function CreateTournamentPage() {
           daily_end_time: formData.dailyEndTime,
           match_duration_minutes: parseInt(formData.matchDuration),
           available_courts: parseInt(formData.availableCourts),
+          registration_price: formData.registrationPrice ? parseInt(formData.registrationPrice) : 0,
           status: 'registration',
         })
         .select()
@@ -298,22 +300,44 @@ export default function CreateTournamentPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="maxPairs">Máximo de Parejas (Opcional)</Label>
-                  <Input
-                    id="maxPairs"
-                    name="maxPairs"
-                    type="number"
-                    min="12"
-                    placeholder="Ej: 16"
-                    value={formData.maxPairs}
-                    onChange={handleChange}
-                    disabled={loading}
-                    autoComplete="off"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Deja vacío para no limitar las inscripciones
-                  </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="maxPairs">Máximo de Parejas (Opcional)</Label>
+                    <Input
+                      id="maxPairs"
+                      name="maxPairs"
+                      type="number"
+                      min="12"
+                      placeholder="Ej: 16"
+                      value={formData.maxPairs}
+                      onChange={handleChange}
+                      disabled={loading}
+                      autoComplete="off"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Deja vacío para no limitar
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="registrationPrice">Costo Inscripción (por jugador)</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                      <Input
+                        id="registrationPrice"
+                        name="registrationPrice"
+                        type="number"
+                        min="0"
+                        step="100"
+                        placeholder="0"
+                        value={formData.registrationPrice}
+                        onChange={handleChange}
+                        disabled={loading}
+                        className="pl-7"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
