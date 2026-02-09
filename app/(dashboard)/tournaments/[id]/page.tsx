@@ -45,6 +45,7 @@ export default function TournamentDetailPage() {
   const [allZoneMatchesCompleted, setAllZoneMatchesCompleted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState('pairs')
 
   useEffect(() => {
     loadTournamentData()
@@ -208,7 +209,7 @@ export default function TournamentDetailPage() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="pairs" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="pairs">
               Parejas ({pairs.length}{tournament.max_pairs ? `/${tournament.max_pairs}` : ''})
@@ -317,10 +318,13 @@ export default function TournamentDetailPage() {
                 {tournament.status === 'registration' && pairs.length >= 4 && (
                   <div className="mt-6 pt-6 border-t">
                     <GenerateZonesButton 
-                    tournamentId={tournamentId} 
-                    pairsCount={pairs.length}
-                    onSuccess={loadTournamentData} 
-                  />
+                      tournamentId={tournamentId} 
+                      pairsCount={pairs.length}
+                      onSuccess={() => {
+                        loadTournamentData()
+                        setActiveTab('matches')
+                      }} 
+                    />
                   </div>
                 )}
               </CardContent>
