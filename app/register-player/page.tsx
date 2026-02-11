@@ -21,6 +21,7 @@ export default function RegisterPlayerPage() {
     email: '',
     phone: '',
     category: '',
+    gender: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -62,6 +63,7 @@ export default function RegisterPlayerPage() {
         last_name: formData.lastName,
         email: formData.email || null,
         phone: formData.phone || null,
+        gender: formData.gender || null,
         current_category: formData.category ? parseInt(formData.category) : null,
       })
 
@@ -77,6 +79,7 @@ export default function RegisterPlayerPage() {
         email: '',
         phone: '',
         category: '',
+        gender: '',
       })
 
       // Redirect after 2 seconds
@@ -220,6 +223,23 @@ export default function RegisterPlayerPage() {
                     onChange={handleChange}
                     disabled={loading}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Género *</Label>
+                  <Select
+                    value={formData.gender}
+                    onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                    disabled={loading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona género" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Masculino">Masculino</SelectItem>
+                      <SelectItem value="Femenino">Femenino</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">

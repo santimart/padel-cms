@@ -28,18 +28,37 @@ export default function CreateTournamentPage() {
     matchDuration: '60',
     availableCourts: '2',
     registrationPrice: '0',
+    rankingId: 'no_ranking',
+    totalPoints: '0',
   })
   const [loading, setLoading] = useState(false)
   const [loadingComplexes, setLoadingComplexes] = useState(true)
   const [error, setError] = useState('')
+  const [rankings, setRankings] = useState<any[]>([])
 
   useEffect(() => {
     loadUserComplexes()
   }, [])
 
+  useEffect(() => {
+    if (formData.complexId) {
+      loadComplexRankings(formData.complexId)
+    }
+  }, [formData.complexId])
+
+  const loadComplexRankings = async (complexId: string) => {
+    const supabase: any = createClient()
+    const { data } = await supabase
+      .from('ranking_definitions')
+      .select('*')
+      .eq('complex_id', complexId)
+    
+    setRankings(data || [])
+  }
+
   const loadUserComplexes = async () => {
     try {
-      const supabase = createClient()
+      const supabase: any = createClient()
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {
@@ -81,11 +100,17 @@ export default function CreateTournamentPage() {
     setError('')
 
     try {
-      const supabase = createClient()
+      const supabase: any = createClient()
 
       // Validate dates
       if (formData.endDate && formData.startDate > formData.endDate) {
         setError('La fecha de fin debe ser posterior a la fecha de inicio')
+        setLoading(false)
+        return
+      }
+
+      if (!formData.gender) {
+        setError('Debes seleccionar un género')
         setLoading(false)
         return
       }
@@ -112,6 +137,8 @@ export default function CreateTournamentPage() {
           match_duration_minutes: parseInt(formData.matchDuration),
           available_courts: parseInt(formData.availableCourts),
           registration_price: formData.registrationPrice ? parseInt(formData.registrationPrice) : 0,
+          ranking_definition_id: formData.rankingId === 'no_ranking' ? null : formData.rankingId,
+          total_points: formData.rankingId !== 'no_ranking' && formData.totalPoints ? parseInt(formData.totalPoints) : 0,
           status: 'registration',
         })
         .select()
@@ -262,6 +289,59 @@ export default function CreateTournamentPage() {
                     </Select>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="rankingId">Ranking (Opcional)</Label>
+                  <Select
+                    value={formData.rankingId}
+                    onValueChange={(value) => setFormData({ ...formData, rankingId: value })}
+                    disabled={loading || !formData.category}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un ranking" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="no_ranking">No suma puntos</SelectItem>
+                      {rankings
+                        .filter((r) => !formData.category || r.category === parseInt(formData.category))
+                        .map((ranking) => (
+                          <SelectItem key={ranking.id} value={ranking.id}>
+                            {ranking.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  {formData.category ? (
+                    <p className="text-xs text-muted-foreground">
+                      Mostrando rankings para {getCategoryName(parseInt(formData.category))}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Selecciona una categoría primero
+                    </p>
+                  )}
+                </div>
+
+                {formData.rankingId !== 'no_ranking' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="totalPoints">Puntos del Torneo (Base)</Label>
+                    <Input
+                      id="totalPoints"
+                      name="totalPoints"
+                      type="number"
+                      min="0"
+                      step="100"
+                      placeholder="Ej: 1000"
+                      value={formData.totalPoints}
+                      onChange={handleChange}
+                      disabled={loading}
+                      autoComplete="off"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Puntos base que se multiplicarán por el porcentaje del ranking (Ej: Master 1000)
+                    </p>
+                  </div>
+                )}
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">

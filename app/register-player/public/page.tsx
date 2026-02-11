@@ -19,6 +19,7 @@ export default function PublicRegisterPlayerPage() {
     email: '',
     phone: '',
     category: '',
+    gender: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -87,6 +88,7 @@ export default function PublicRegisterPlayerPage() {
         last_name: formData.lastName,
         email: formData.email || null,
         phone: formData.phone || null,
+        gender: formData.gender || null,
         current_category: formData.category ? parseInt(formData.category) : null,
       } as any)
 
@@ -102,6 +104,7 @@ export default function PublicRegisterPlayerPage() {
         email: '',
         phone: '',
         category: '',
+        gender: '',
       })
       generateCaptcha()
 
@@ -228,6 +231,23 @@ export default function PublicRegisterPlayerPage() {
                   disabled={loading}
                   className="h-11"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gender">Género *</Label>
+                <Select
+                  value={formData.gender}
+                  onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Selecciona género" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Masculino">Masculino</SelectItem>
+                    <SelectItem value="Femenino">Femenino</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

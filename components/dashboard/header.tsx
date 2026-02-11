@@ -24,9 +24,10 @@ export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) 
   return (
     <header className="border-b border-border/40 bg-card sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
+            
             <img 
               src={logoUrl} 
               alt={complexName || 'Complex Logo'} 
@@ -42,11 +43,11 @@ export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) 
           <span className="text-xl font-bold truncate max-w-[200px] sm:max-w-none">
             {complexName || 'Padel Manager'}
           </span>
-        </div>
+        </Link>
         
         <nav className="flex items-center gap-4">
           <Button variant="ghost" asChild className="hidden sm:inline-flex">
-            <Link href="/">Inicio</Link>
+            
           </Button>
           <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
             <LogOut className="h-4 w-4" />

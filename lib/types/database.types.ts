@@ -47,6 +47,7 @@ export interface Database {
           last_name: string
           phone: string | null
           photo_url: string | null
+          gender: 'Masculino' | 'Femenino' | null
           current_category: number | null
           created_at: string
           updated_at: string
@@ -59,6 +60,7 @@ export interface Database {
           last_name: string
           phone?: string | null
           photo_url?: string | null
+          gender?: 'M' | 'F' | null
           current_category?: number | null
           created_at?: string
           updated_at?: string
@@ -71,6 +73,7 @@ export interface Database {
           last_name?: string
           phone?: string | null
           photo_url?: string | null
+          gender?: 'M' | 'F' | null
           current_category?: number | null
           created_at?: string
           updated_at?: string
@@ -107,6 +110,7 @@ export interface Database {
           category: number | null
           gender: 'Masculino' | 'Femenino' | 'Mixto' | null
           status: 'registration' | 'zones' | 'playoffs' | 'finished'
+          total_points: number | null
           max_pairs: number | null
           start_date: string | null
           end_date: string | null
@@ -115,6 +119,7 @@ export interface Database {
           match_duration_minutes: number | null
           available_courts: number | null
           registration_price: number
+          ranking_definition_id: string | null
           created_at: string
           updated_at: string
         }
@@ -125,6 +130,7 @@ export interface Database {
           category?: number | null
           gender?: 'Masculino' | 'Femenino' | 'Mixto' | null
           status?: 'registration' | 'zones' | 'playoffs' | 'finished'
+          total_points?: number | null
           max_pairs?: number | null
           start_date?: string | null
           end_date?: string | null
@@ -133,6 +139,7 @@ export interface Database {
           match_duration_minutes?: number | null
           available_courts?: number | null
           registration_price?: number
+          ranking_definition_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -143,6 +150,7 @@ export interface Database {
           category?: number | null
           gender?: 'Masculino' | 'Femenino' | 'Mixto' | null
           status?: 'registration' | 'zones' | 'playoffs' | 'finished'
+          total_points?: number | null
           max_pairs?: number | null
           start_date?: string | null
           end_date?: string | null
@@ -151,6 +159,7 @@ export interface Database {
           match_duration_minutes?: number | null
           available_courts?: number | null
           registration_price?: number
+          ranking_definition_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -275,12 +284,41 @@ export interface Database {
           created_at?: string
         }
       }
+      ranking_definitions: {
+        Row: {
+          id: string
+          complex_id: string
+          name: string
+          category: number
+          base_points: number
+          points_distribution: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          complex_id: string
+          name: string
+          category: number
+          base_points?: number
+          points_distribution?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          complex_id?: string
+          name?: string
+          category?: number
+          base_points?: number
+          points_distribution?: Json
+          created_at?: string
+        }
+      }
       rankings: {
         Row: {
           id: string
           player_id: string
           category: number
-          season_year: number
+          ranking_definition_id: string
           total_points: number
           tournaments_played: number
           updated_at: string
@@ -289,7 +327,7 @@ export interface Database {
           id?: string
           player_id: string
           category: number
-          season_year: number
+          ranking_definition_id: string
           total_points?: number
           tournaments_played?: number
           updated_at?: string
@@ -298,7 +336,7 @@ export interface Database {
           id?: string
           player_id?: string
           category?: number
-          season_year?: number
+          ranking_definition_id?: string
           total_points?: number
           tournaments_played?: number
           updated_at?: string

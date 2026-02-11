@@ -13,6 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import { GenerateZonesButton } from '@/components/tournaments/generate-zones-button'
 import { GeneratePlayoffsButton } from '@/components/tournaments/generate-playoffs-button'
+import { FinishTournamentButton } from '@/components/tournaments/finish-tournament-button'
+
 import { DeletePairButton } from '@/components/tournaments/delete-pair-button'
 import { ZonesDisplay } from '@/components/tournaments/zones-display'
 import { MatchesDisplay } from '@/components/tournaments/matches-display'
@@ -27,6 +29,10 @@ type TournamentWithComplex = Tournament & {
     name: string
     location: string | null
   }
+  ranking_definitions: {
+    id: string
+    name: string
+  } | null
 }
 
 type PairWithPlayers = Pair & {
@@ -43,6 +49,7 @@ export default function TournamentDetailPage() {
   const [pairs, setPairs] = useState<PairWithPlayers[]>([])
   const [hasPlayoffs, setHasPlayoffs] = useState(false)
   const [allZoneMatchesCompleted, setAllZoneMatchesCompleted] = useState(false)
+  const [allPlayoffMatchesCompleted, setAllPlayoffMatchesCompleted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('pairs')
@@ -64,6 +71,10 @@ export default function TournamentDetailPage() {
             id,
             name,
             location
+          ),
+          ranking_definitions (
+            id,
+            name
           )
         `)
         .eq('id', tournamentId)
@@ -107,6 +118,18 @@ export default function TournamentDetailPage() {
       const allCompleted = Boolean(zoneMatches && zoneMatches.length > 0 && 
         zoneMatches.every(match => match.status === 'completed' || match.status === 'walkover'))
       setAllZoneMatchesCompleted(allCompleted)
+
+      // Check if all playoff matches are completed
+      const { data: allPlayoffMatches } = await supabase
+        .from('matches')
+        .select('id, status')
+        .eq('tournament_id', tournamentId)
+        .eq('phase', 'playoffs')
+        .returns<{ id: string, status: string }[]>()
+
+      const allPlayoffsCompleted = Boolean(allPlayoffMatches && allPlayoffMatches.length > 0 && 
+        allPlayoffMatches.every(match => match.status === 'completed' || match.status === 'walkover'))
+      setAllPlayoffMatchesCompleted(allPlayoffsCompleted)
     } catch (err: any) {
       console.error('Error loading tournament:', err)
       setError(err.message)
@@ -426,8 +449,46 @@ export default function TournamentDetailPage() {
                         ? new Date(tournament.end_date).toLocaleDateString('es-AR')
                         : 'No definida'}
                     </p>
+                    <div>
+                    <Label className="text-sm font-medium">Ranking Asignado</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {tournament.ranking_definitions ? (
+                        <Link href={`/rankings/${tournament.ranking_definitions.id}`} className="hover:underline text-primary">
+                          {tournament.ranking_definitions.name}
+                        </Link>
+                      ) : (
+                        'No suma puntos'
+                      )}
+                    </p>
+                  </div>
+                  {tournament.ranking_definitions && (
+                    <div>
+                      <Label className="text-sm font-medium">Puntos del Torneo</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {tournament.total_points || 0} puntos base
+                      </p>
+                    </div>
+                  )}
+                </div>
+                </div>
+
+                {tournament.status !== 'finished' && (
+                <div className="mt-8 pt-6 border-t flex flex-col gap-4">
+                  <h3 className="text-lg font-medium text-destructive">Zona de Peligro</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Estas acciones son irreversibles y afectarán el estado del torneo y rankings.
+                  </p>
+                  <div className="flex justify-start gap-4">
+                    <FinishTournamentButton 
+                      tournamentId={tournament.id} 
+                      hasRanking={!!tournament.ranking_definition_id}
+                      allMatchesCompleted={allPlayoffMatchesCompleted}
+                    />
                   </div>
                 </div>
+                )}
+
+
               </CardContent>
             </Card>
           </TabsContent>
