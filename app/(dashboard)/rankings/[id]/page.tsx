@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { getRankingDefinition, getRankingLeaderboard } from '@/lib/actions/rankings'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatName } from '@/lib/utils'
+import { RankingQRDialog } from '@/components/ranking/ranking-qr-dialog'
 
 interface LeaderboardEntry {
   id: string
@@ -106,7 +107,9 @@ export default async function RankingDetailPage({ params }: { params: Promise<{ 
             Categoría {ranking.category} • Base: {ranking.base_points} pts
           </p>
         </div>
-        {/* Future: Edit button */}
+        <div className="flex items-center gap-2">
+          <RankingQRDialog rankingId={ranking.id} rankingName={ranking.name} />
+        </div>
       </div>
 
       <div className="grid gap-6">
