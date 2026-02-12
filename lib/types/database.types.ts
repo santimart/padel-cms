@@ -49,6 +49,8 @@ export type Database = {
           photo_url: string | null
           gender: 'Masculino' | 'Femenino' | null
           current_category: number | null
+          province: string | null
+          city: string | null
           created_at: string
           updated_at: string
         }
@@ -62,6 +64,8 @@ export type Database = {
           photo_url?: string | null
           gender?: 'M' | 'F' | null
           current_category?: number | null
+          province?: string | null
+          city?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -75,6 +79,8 @@ export type Database = {
           photo_url?: string | null
           gender?: 'M' | 'F' | null
           current_category?: number | null
+          province?: string | null
+          city?: string | null
           created_at?: string
           updated_at?: string
         }

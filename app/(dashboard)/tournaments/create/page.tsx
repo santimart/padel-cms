@@ -218,7 +218,7 @@ export default function CreateTournamentPage() {
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Ej: Torneo Verano 2024"
+                    placeholder="Ej: Torneo Verano 2026"
                     value={formData.name}
                     onChange={handleChange}
                     required

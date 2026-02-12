@@ -11,6 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CATEGORIES } from '@/lib/types'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
+import { useGeoRef, type Province, type Locality } from '@/hooks/use-georef'
+import { Autocomplete } from '@/components/ui/autocomplete'
 
 export default function RegisterPlayerPage() {
   const router = useRouter()
@@ -22,10 +24,52 @@ export default function RegisterPlayerPage() {
     phone: '',
     category: '',
     gender: '',
+    province: '',
+    city: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+
+  // GeoRef Hook
+  const { provinces, loadingProvinces, getLocalities } = useGeoRef()
+  const [localities, setLocalities] = useState<Locality[]>([])
+  const [loadingLocalities, setLoadingLocalities] = useState(false)
+
+  const handleProvinceChange = async (provinceId: string) => {
+    // Find province name
+    const province = provinces.find(p => p.id === provinceId)
+    
+    setFormData(prev => ({ 
+      ...prev, 
+      province: province?.nombre || '',
+      city: '' // Reset city when province changes
+    }))
+    
+    if (provinceId) {
+      setLoadingLocalities(true)
+      try {
+        const locs = await getLocalities(provinceId)
+        setLocalities(locs)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoadingLocalities(false)
+      }
+    } else {
+      setLocalities([])
+    }
+  }
+
+  const handleCityChange = (cityId: string) => {
+    // Find city name - the autocomplete might return ID or Name depending on implementation
+    // Our Autocomplete returns ID, but we want to store the Name.
+    // However, for simplicity and since names are unique enough within a province, let's assume we store names
+    // But wait, the Autocomplete component returns the ID.
+    // Let's adapt:
+    const city = localities.find(l => l.id === cityId)
+    setFormData(prev => ({ ...prev, city: city?.nombre || '' }))
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -65,6 +109,8 @@ export default function RegisterPlayerPage() {
         phone: formData.phone || null,
         gender: formData.gender || null,
         current_category: formData.category ? parseInt(formData.category) : null,
+        province: formData.province || null,
+        city: formData.city || null,
       })
 
       if (insertError) throw insertError
@@ -80,6 +126,8 @@ export default function RegisterPlayerPage() {
         phone: '',
         category: '',
         gender: '',
+        province: '',
+        city: '',
       })
 
       // Redirect after 2 seconds
@@ -218,7 +266,7 @@ export default function RegisterPlayerPage() {
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="+54 9 11 1234-5678"
+                    placeholder="353 5678909"
                     value={formData.phone}
                     onChange={handleChange}
                     disabled={loading}
@@ -240,6 +288,33 @@ export default function RegisterPlayerPage() {
                       <SelectItem value="Femenino">Femenino</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="province">Provincia</Label>
+                    <Autocomplete
+                      options={provinces.map(p => ({ id: p.id, label: p.nombre }))}
+                      value={provinces.find(p => p.nombre === formData.province)?.id || ''}
+                      onChange={handleProvinceChange}
+                      placeholder="Selecciona provincia"
+                      loading={loadingProvinces}
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="city">Localidad</Label>
+                    <Autocomplete
+                      options={localities.map(l => ({ id: l.id, label: l.nombre }))}
+                      value={localities.find(l => l.nombre === formData.city)?.id || ''}
+                      onChange={handleCityChange}
+                      placeholder="Selecciona localidad"
+                      emptyMessage={formData.province ? "No se encontraron localidades" : "Selecciona una provincia primero"}
+                      loading={loadingLocalities}
+                      disabled={loading || !formData.province}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
