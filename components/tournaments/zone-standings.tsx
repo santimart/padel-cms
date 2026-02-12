@@ -14,19 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { formatName } from '@/lib/utils'
 import { calculateZoneStandings, formatStandingsRecord, isQualified } from '@/lib/tournament/standings-calculator'
-import type { Pair, Player } from '@/lib/types'
-
-interface Match {
-  id: string
-  pair1_id: string
-  pair2_id: string
-  pair1_sets: number
-  pair2_sets: number
-  pair1_games: number[] | null
-  pair2_games: number[] | null
-  winner_id: string | null
-  status: string
-}
+import type { Pair, Player, Match } from '@/lib/types'
 
 type PairWithPlayers = Pair & {
   player1: Player

@@ -44,7 +44,7 @@ export default function RegisterPlayerPage() {
       const supabase = createClient()
 
       // Check if player already exists by DNI
-      const { data: existingPlayer } = await supabase
+      const { data: existingPlayer } = await (supabase as any)
         .from('players')
         .select('id')
         .eq('dni', formData.dni)
@@ -57,7 +57,7 @@ export default function RegisterPlayerPage() {
       }
 
       // Create new player
-      const { error: insertError } = await supabase.from('players').insert({
+      const { error: insertError } = await (supabase as any).from('players').insert({
         dni: formData.dni,
         first_name: formData.firstName,
         last_name: formData.lastName,

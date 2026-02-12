@@ -87,7 +87,7 @@ export default function RegisterPage() {
       await new Promise(resolve => setTimeout(resolve, 500))
 
       // 3. Create complex for this user using the database function
-      const { data: complexId, error: complexError } = await supabase
+      const { data: complexId, error: complexError } = await (supabase as any)
         .rpc('create_complex_for_user', {
           user_id: authData.user.id,
           complex_name: formData.complexName,
@@ -121,7 +121,7 @@ export default function RegisterPage() {
                .getPublicUrl(fileName)
 
              // Update complex with logo_url
-             await supabase
+             await (supabase as any)
                .from('complexes')
                .update({ logo_url: publicUrl })
                .eq('id', complexId)

@@ -59,7 +59,7 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
       setLoading(true)
       const supabase = createClient()
       
-      const { data: pairs, error } = await supabase
+      const { data: pairs, error } = await (supabase as any)
         .from('pairs')
         .select(`
           *,
@@ -128,7 +128,7 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
       const supabase = createClient()
       const fieldToUpdate = player.isPlayer1 ? 'player1_paid' : 'player2_paid'
       
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('pairs')
         .update({ [fieldToUpdate]: newStatus })
         .eq('id', player.pairId)

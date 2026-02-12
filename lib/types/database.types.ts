@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       complexes: {
@@ -380,6 +380,20 @@ export interface Database {
           complex_location: string
         }
         Returns: string
+      }
+      search_players_unaccent: {
+        Args: {
+          search_term: string
+        }
+        Returns: {
+          id: string
+          first_name: string
+          last_name: string
+          dni: string
+          photo_url: string | null
+          current_category: number | null
+          gender: string | null
+        }[]
       }
     }
     Enums: {

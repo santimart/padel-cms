@@ -15,11 +15,11 @@ export default async function DashboardLayout({
   }
 
   // Fetch complex for this user
-  const { data: complex } = await supabase
+  const { data: complex } = await (supabase
     .from('complexes')
     .select('name, logo_url')
     .eq('owner_id', user.id)
-    .single()
+    .single() as any)
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

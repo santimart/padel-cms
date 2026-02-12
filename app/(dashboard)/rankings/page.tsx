@@ -53,13 +53,14 @@ async function RankingList({ complexId }: { complexId: string }) {
 export default async function RankingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  
+  if (!user) return <div>Acceso denegado</div>
+
   // Fetch complex ID for the user
-  const { data: complex } = await supabase
+  const { data: complex } = await (supabase
     .from('complexes')
     .select('id')
-    .eq('owner_id', user?.id)
-    .single()
+    .eq('owner_id', user.id)
+    .single() as any)
 
   if (!complex) return <div>No se encontró el complejo</div>
 

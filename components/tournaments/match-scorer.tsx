@@ -187,7 +187,7 @@ export function MatchScorer({
         winnerId = pair1SetsWon > pair2SetsWon ? pair1Id : pair2Id
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('matches')
         .update({
           pair1_sets: pair1SetsWon,

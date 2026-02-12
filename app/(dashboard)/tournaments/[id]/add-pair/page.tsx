@@ -46,7 +46,7 @@ export default function AddPairPage() {
       const supabase = createClient()
       
       // Use PostgreSQL unaccent function for scalable accent-insensitive search
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .rpc('search_players_unaccent', { search_term: term })
 
       if (error) {
@@ -111,11 +111,11 @@ export default function AddPairPage() {
       const supabase = createClient()
 
       // Check if either player is already registered in this tournament
-      const { data: existingPairs, error: checkError } = await supabase
+      const { data: existingPairs, error: checkError } = await (supabase
         .from('pairs')
         .select('id, player1:players!pairs_player1_id_fkey(first_name, last_name), player2:players!pairs_player2_id_fkey(first_name, last_name)')
         .eq('tournament_id', tournamentId)
-        .or(`player1_id.eq.${selectedPlayer1.id},player2_id.eq.${selectedPlayer1.id},player1_id.eq.${selectedPlayer2.id},player2_id.eq.${selectedPlayer2.id}`)
+        .or(`player1_id.eq.${selectedPlayer1.id},player2_id.eq.${selectedPlayer1.id},player1_id.eq.${selectedPlayer2.id},player2_id.eq.${selectedPlayer2.id}`) as any)
 
       if (checkError) {
         console.error('Error checking existing pairs:', checkError)
@@ -132,7 +132,7 @@ export default function AddPairPage() {
       }
 
       // Insert pair
-      const { error: insertError } = await supabase.from('pairs').insert({
+      const { error: insertError } = await (supabase.from('pairs') as any).insert({
         tournament_id: tournamentId,
         player1_id: selectedPlayer1.id,
         player2_id: selectedPlayer2.id,
