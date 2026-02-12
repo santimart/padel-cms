@@ -13,6 +13,7 @@ import { CATEGORIES } from '@/lib/types'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import { useGeoRef, type Province, type Locality } from '@/hooks/use-georef'
 import { Autocomplete } from '@/components/ui/autocomplete'
+import { ModeToggle } from '@/components/mode-toggle'
 
 export default function RegisterPlayerPage() {
   const router = useRouter()
@@ -156,6 +157,7 @@ export default function RegisterPlayerPage() {
             </Link>
           </div>
           <nav className="flex items-center gap-4">
+            <ModeToggle />
             <Button variant="ghost" asChild>
               <Link href="/dashboard">Dashboard</Link>
             </Button>

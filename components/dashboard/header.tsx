@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { LogOut } from 'lucide-react'
+import { ModeToggle } from '@/components/mode-toggle'
 
 interface DashboardHeaderProps {
   complexName?: string
@@ -49,6 +50,7 @@ export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) 
           <Button variant="ghost" asChild className="hidden sm:inline-flex">
             
           </Button>
+          <ModeToggle />
           <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Cerrar Sesión</span>
