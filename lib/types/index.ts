@@ -90,11 +90,29 @@ export type TournamentStatus = typeof TOURNAMENT_STATUSES[number]
 export const MATCH_STATUSES = ['scheduled', 'in_progress', 'completed', 'walkover'] as const
 export type MatchStatus = typeof MATCH_STATUSES[number]
 
-// Points distribution for rankings
+// Points distribution for rankings (percentages - champion = 100% of tournament base points)
 export const RANKING_POINTS = {
-  champion: 1000,
-  finalist: 800,
-  semifinalist: 600,
-  quarterfinalist: 400,
-  zoneOnly: 200,
+  champion: 100,
+  finalist: 60,
+  semifinalist: 36,
+  quarterfinalist: 18,
+  round_of_16: 9,
+  round_of_32: 5,
+  round_of_64: 3,
+  participation: 1,
 } as const
+
+export type RankingPointsDistribution = {
+  champion: number
+  finalist: number
+  semifinalist: number
+  quarterfinalist: number
+  round_of_16: number
+  round_of_32: number
+  round_of_64: number
+  participation: number
+}
+
+export type RankingDefinition = Database['public']['Tables']['ranking_definitions']['Row'] & {
+  points_distribution: RankingPointsDistribution
+}

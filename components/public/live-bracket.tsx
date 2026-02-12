@@ -68,9 +68,18 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
   const p1Lost = winnerId && winnerId !== match.pair1_id
   const p2Lost = winnerId && winnerId !== match.pair2_id
   
-  // Cast games to number[]
-  const p1Games = (match.pair1_games as number[]) || []
-  const p2Games = (match.pair2_games as number[]) || []
+  // Helper to get games array safely
+  const getGames = (gamesData: any): number[] => {
+    try {
+      if (!gamesData) return []
+      return typeof gamesData === 'string' ? JSON.parse(gamesData) : gamesData
+    } catch {
+      return []
+    }
+  }
+
+  const p1Games = getGames(match.pair1_games)
+  const p2Games = getGames(match.pair2_games)
 
   return (
     <Card className="border-border shadow-sm min-w-[280px]">
@@ -83,16 +92,21 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
                     <span>{formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)}</span>
                     <span>{formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}</span>
                    </span>
-               ) : 'A definir'}
+               ) : (
+                  <span className="text-muted-foreground italic">A definir</span>
+               )}
            </div>
            
            <div className="flex items-center gap-3">
-             <div className="flex gap-4 text-white font-mono text-lg font-bold">
+             <div className="flex gap-2 text-foreground font-mono font-bold">
                 {p1Games.map((g, i) => (
-                  <span key={i}>{g}</span>
+                  <span key={i} className={`px-2 py-0.5 rounded text-center min-w-[24px] ${
+                      (p1Games[i] > p2Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                  }`}>
+                      {g}
+                  </span>
                 ))}
              </div>
-             {/* {match.pair1_sets !== null && <span className="font-mono font-bold text-lg">{match.pair1_sets}</span>} */}
            </div>
         </div>
 
@@ -106,22 +120,26 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
                     <span>{formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)}</span>
                     <span>{formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}</span>
                    </span>
-               ) : 'A definir'}
+               ) : (
+                  <span className="text-muted-foreground italic">A definir</span>
+               )}
            </div>
            
            <div className="flex items-center gap-3">
-             <div className="flex gap-4 text-white font-mono text-lg font-bold">
+             <div className="flex gap-2 text-foreground font-mono font-bold">
                 {p2Games.map((g, i) => (
-                  <span key={i}>{g}</span>
+                  <span key={i} className={`px-2 py-0.5 rounded text-center min-w-[24px] ${
+                      (p2Games[i] > p1Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                  }`}>
+                      {g}
+                  </span>
                 ))}
              </div>
-             {/* {match.pair2_sets !== null && <span className="font-mono font-bold text-lg">{match.pair2_sets}</span>} */}
            </div>
         </div>
         
         <div className="text-xs text-center mt-1 text-muted-foreground">
              {match.zone?.name ? `Zona ${match.zone.name}` : ''}
-             {/* {match.round && !match.zone && <span className="uppercase">{ROUND_LABELS[match.round] || match.round}</span>} */}
               {match.scheduled_time && !match.winner_id && (
                   <span className="ml-1">
                       • {new Date(match.scheduled_time).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'})}

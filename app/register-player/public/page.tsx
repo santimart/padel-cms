@@ -19,6 +19,7 @@ export default function PublicRegisterPlayerPage() {
     email: '',
     phone: '',
     category: '',
+    gender: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -68,7 +69,7 @@ export default function PublicRegisterPlayerPage() {
       const supabase = createClient()
 
       // Check if player already exists by DNI
-      const { data: existingPlayer } = await supabase
+      const { data: existingPlayer } = await (supabase as any)
         .from('players')
         .select('id')
         .eq('dni', formData.dni)
@@ -81,14 +82,15 @@ export default function PublicRegisterPlayerPage() {
       }
 
       // Create new player
-      const { error: insertError } = await supabase.from('players').insert({
+      const { error: insertError } = await (supabase as any).from('players').insert({
         dni: formData.dni,
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email || null,
         phone: formData.phone || null,
+        gender: formData.gender || null,
         current_category: formData.category ? parseInt(formData.category) : null,
-      } as any)
+      })
 
       if (insertError) throw insertError
 
@@ -102,6 +104,7 @@ export default function PublicRegisterPlayerPage() {
         email: '',
         phone: '',
         category: '',
+        gender: '',
       })
       generateCaptcha()
 
@@ -228,6 +231,23 @@ export default function PublicRegisterPlayerPage() {
                   disabled={loading}
                   className="h-11"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gender">Género *</Label>
+                <Select
+                  value={formData.gender}
+                  onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Selecciona género" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Masculino">Masculino</SelectItem>
+                    <SelectItem value="Femenino">Femenino</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

@@ -6,19 +6,7 @@ import { formatName } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ZoneStandings } from '@/components/tournaments/zone-standings'
-import type { Pair, Player } from '@/lib/types'
-
-interface Zone {
-  id: string
-  name: string
-  tournament_id: string
-  created_at: string
-}
-
-type PairWithPlayers = Pair & {
-  player1: Player
-  player2: Player
-}
+import type { Pair, Player, Zone, PairWithPlayers } from '@/lib/types'
 
 interface ZonesDisplayProps {
   tournamentId: string
@@ -71,11 +59,11 @@ export function ZonesDisplay({ tournamentId }: ZonesDisplayProps) {
 
       // Group pairs by zone
       const grouped: { [zoneId: string]: PairWithPlayers[] } = {}
-      zonesData.forEach(zone => {
+      ;(zonesData as Zone[]).forEach(zone => {
         grouped[zone.id] = []
       })
 
-      pairsData?.forEach(pair => {
+      ;(pairsData as PairWithPlayers[])?.forEach(pair => {
         if (pair.zone_id && grouped[pair.zone_id]) {
           grouped[pair.zone_id].push(pair as PairWithPlayers)
         }

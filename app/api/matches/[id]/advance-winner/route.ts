@@ -71,14 +71,12 @@ export async function POST(
     const { nextRound, nextBracketPosition, isTopSlot } = nextRoundInfo
 
     // Check if next round match already exists
-    const { data: existingNextMatch } = await supabase
-      .from('matches')
+    const { data: existingNextMatch } = await (supabase as any).from('matches')
       .select('*')
       .eq('tournament_id', matchData.tournament_id)
       .eq('phase', 'playoffs')
-      .eq('round', nextRound)
+      .eq('round', nextRound as string)
       .eq('bracket_position', nextBracketPosition)
-      .returns<Match>()
       .single()
 
     if (existingNextMatch) {
@@ -90,8 +88,7 @@ export async function POST(
         updatePayload.pair2_id = matchData.winner_id
       }
       
-      const { error: updateError } = await supabase
-        .from('matches')
+      const { error: updateError } = await (supabase as any).from('matches')
         .update(updatePayload)
         .eq('id', existingNextMatch.id)
 

@@ -1,31 +1,34 @@
-import { RANKING_POINTS } from '@/lib/types'
+import { RANKING_POINTS, RankingPointsDistribution } from '@/lib/types'
 
 /**
  * Calculate points awarded based on final position in tournament
  */
 export function calculatePointsForPosition(
   finalPosition: number,
-  totalPairs: number
+  totalPairs: number,
+  distribution: RankingPointsDistribution = RANKING_POINTS,
+  tournamentPoints: number = 0
 ): number {
-  // Determine tournament size category
-  const isMajor = totalPairs >= 16
+  const calculate = (percentage: number) => Math.round((percentage / 100) * tournamentPoints)
 
   switch (finalPosition) {
     case 1: // Champion
-      return RANKING_POINTS.champion
+      return calculate(distribution.champion)
     case 2: // Finalist
-      return RANKING_POINTS.finalist
+      return calculate(distribution.finalist)
     case 3: // Semi-finalist (if lost in semis)
     case 4:
-      return RANKING_POINTS.semifinalist
+      return calculate(distribution.semifinalist)
     case 5: // Quarter-finalist
     case 6:
     case 7:
     case 8:
-      return RANKING_POINTS.quarterfinalist
+      return calculate(distribution.quarterfinalist)
     default:
-      // Participated in zone phase only
-      return RANKING_POINTS.zoneOnly
+      if (finalPosition <= 16) return calculate(distribution.round_of_16)
+      if (finalPosition <= 32) return calculate(distribution.round_of_32)
+      if (finalPosition <= 64) return calculate(distribution.round_of_64)
+      return calculate(distribution.participation)
   }
 }
 
@@ -54,13 +57,15 @@ export function prepareRankingUpdates(
     finalPosition: number
   }>,
   category: number,
-  totalPairs: number
+  totalPairs: number,
+  tournamentPoints: number,
+  distribution?: RankingPointsDistribution
 ): RankingUpdate[] {
   const updates: RankingUpdate[] = []
   const seasonYear = getCurrentSeason()
 
   tournamentResults.forEach((result) => {
-    const points = calculatePointsForPosition(result.finalPosition, totalPairs)
+    const points = calculatePointsForPosition(result.finalPosition, totalPairs, distribution, tournamentPoints)
 
     // Add update for both players in the pair
     updates.push({

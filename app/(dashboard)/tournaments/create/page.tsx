@@ -27,18 +27,38 @@ export default function CreateTournamentPage() {
     dailyEndTime: '21:00',
     matchDuration: '60',
     availableCourts: '2',
+    registrationPrice: '0',
+    rankingId: 'no_ranking',
+    totalPoints: '0',
   })
   const [loading, setLoading] = useState(false)
   const [loadingComplexes, setLoadingComplexes] = useState(true)
   const [error, setError] = useState('')
+  const [rankings, setRankings] = useState<any[]>([])
 
   useEffect(() => {
     loadUserComplexes()
   }, [])
 
+  useEffect(() => {
+    if (formData.complexId) {
+      loadComplexRankings(formData.complexId)
+    }
+  }, [formData.complexId])
+
+  const loadComplexRankings = async (complexId: string) => {
+    const supabase: any = createClient()
+    const { data } = await supabase
+      .from('ranking_definitions')
+      .select('*')
+      .eq('complex_id', complexId)
+    
+    setRankings(data || [])
+  }
+
   const loadUserComplexes = async () => {
     try {
-      const supabase = createClient()
+      const supabase: any = createClient()
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {
@@ -59,7 +79,7 @@ export default function CreateTournamentPage() {
       if (data && data.length === 1) {
         setFormData(prev => ({ ...prev, complexId: data[0].id }))
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading complexes:', error)
       setError('Error al cargar tus complejos')
     } finally {
@@ -80,11 +100,17 @@ export default function CreateTournamentPage() {
     setError('')
 
     try {
-      const supabase = createClient()
+      const supabase: any = createClient()
 
       // Validate dates
       if (formData.endDate && formData.startDate > formData.endDate) {
         setError('La fecha de fin debe ser posterior a la fecha de inicio')
+        setLoading(false)
+        return
+      }
+
+      if (!formData.gender) {
+        setError('Debes seleccionar un género')
         setLoading(false)
         return
       }
@@ -110,6 +136,9 @@ export default function CreateTournamentPage() {
           daily_end_time: formData.dailyEndTime,
           match_duration_minutes: parseInt(formData.matchDuration),
           available_courts: parseInt(formData.availableCourts),
+          registration_price: formData.registrationPrice ? parseInt(formData.registrationPrice) : 0,
+          ranking_definition_id: formData.rankingId === 'no_ranking' ? null : formData.rankingId,
+          total_points: formData.rankingId !== 'no_ranking' && formData.totalPoints ? parseInt(formData.totalPoints) : 0,
           status: 'registration',
         })
         .select()
@@ -140,80 +169,43 @@ export default function CreateTournamentPage() {
 
   if (complexes.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border/40 bg-card">
-          <div className="container mx-auto px-4 py-4">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="text-xl font-bold">Padel Manager</span>
-            </Link>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 py-8">
-          <Card className="max-w-2xl mx-auto">
-            <CardContent className="pt-6 text-center">
-              <h2 className="text-2xl font-bold mb-4">No tienes complejos registrados</h2>
-              <p className="text-muted-foreground mb-6">
-                Necesitas tener al menos un complejo registrado para crear torneos
-              </p>
-              <Button asChild>
-                <Link href="/dashboard">Volver al Dashboard</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </main>
+      <div className="container mx-auto">
+        <Card className="max-w-2xl mx-auto mt-8">
+          <CardContent className="pt-6 text-center">
+            <h2 className="text-2xl font-bold mb-4">No tienes complejos registrados</h2>
+            <p className="text-muted-foreground mb-6">
+              Necesitas tener al menos un complejo registrado para crear torneos
+            </p>
+            <Button asChild>
+              <Link href="/dashboard">Volver al Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/40 bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="text-xl font-bold">Padel Manager</span>
-            </Link>
-          </div>
-          <nav className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link href="/tournaments">Torneos</Link>
-            </Button>
-          </nav>
-        </div>
-      </header>
+    <div className="max-w-2xl mx-auto">
+      <div className="mb-8">
+        <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
+          ← Volver al dashboard
+        </Link>
+        <h1 className="text-3xl font-bold mb-2">Crear Torneo</h1>
+        <p className="text-muted-foreground">
+          Configura un nuevo torneo de pádel para tu complejo
+        </p>
+      </div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-8">
-            <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
-              ← Volver al dashboard
-            </Link>
-            <h1 className="text-3xl font-bold mb-2">Crear Torneo</h1>
-            <p className="text-muted-foreground">
-              Configura un nuevo torneo de pádel para tu complejo
-            </p>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Datos del Torneo</CardTitle>
-              <CardDescription>
-                Los campos marcados con * son obligatorios
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+      <Card>
+        <CardHeader>
+          <CardTitle>Datos del Torneo</CardTitle>
+          <CardDescription>
+            Los campos marcados con * son obligatorios
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
                 {error && (
                   <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                     {error}
@@ -299,21 +291,96 @@ export default function CreateTournamentPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="maxPairs">Máximo de Parejas (Opcional)</Label>
-                  <Input
-                    id="maxPairs"
-                    name="maxPairs"
-                    type="number"
-                    min="12"
-                    placeholder="Ej: 16"
-                    value={formData.maxPairs}
-                    onChange={handleChange}
-                    disabled={loading}
-                    autoComplete="off"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Deja vacío para no limitar las inscripciones
-                  </p>
+                  <Label htmlFor="rankingId">Ranking (Opcional)</Label>
+                  <Select
+                    value={formData.rankingId}
+                    onValueChange={(value) => setFormData({ ...formData, rankingId: value })}
+                    disabled={loading || !formData.category}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un ranking" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="no_ranking">No suma puntos</SelectItem>
+                      {rankings
+                        .filter((r) => !formData.category || r.category === parseInt(formData.category))
+                        .map((ranking) => (
+                          <SelectItem key={ranking.id} value={ranking.id}>
+                            {ranking.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  {formData.category ? (
+                    <p className="text-xs text-muted-foreground">
+                      Mostrando rankings para {getCategoryName(parseInt(formData.category))}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Selecciona una categoría primero
+                    </p>
+                  )}
+                </div>
+
+                {formData.rankingId !== 'no_ranking' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="totalPoints">Puntos del Torneo (Base)</Label>
+                    <Input
+                      id="totalPoints"
+                      name="totalPoints"
+                      type="number"
+                      min="0"
+                      step="100"
+                      placeholder="Ej: 1000"
+                      value={formData.totalPoints}
+                      onChange={handleChange}
+                      disabled={loading}
+                      autoComplete="off"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Puntos base que se multiplicarán por el porcentaje del ranking (Ej: Master 1000)
+                    </p>
+                  </div>
+                )}
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="maxPairs">Máximo de Parejas (Opcional)</Label>
+                    <Input
+                      id="maxPairs"
+                      name="maxPairs"
+                      type="number"
+                      min="12"
+                      placeholder="Ej: 16"
+                      value={formData.maxPairs}
+                      onChange={handleChange}
+                      disabled={loading}
+                      autoComplete="off"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Deja vacío para no limitar
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="registrationPrice">Costo Inscripción (por jugador)</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                      <Input
+                        id="registrationPrice"
+                        name="registrationPrice"
+                        type="number"
+                        min="0"
+                        step="100"
+                        placeholder="0"
+                        value={formData.registrationPrice}
+                        onChange={handleChange}
+                        disabled={loading}
+                        className="pl-7"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
@@ -432,7 +499,5 @@ export default function CreateTournamentPage() {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
   )
 }

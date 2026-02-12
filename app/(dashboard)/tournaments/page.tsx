@@ -32,20 +32,20 @@ export default function TournamentsPage() {
       if (!user) return
 
       // Get user's complexes
-      const { data: complexes } = await supabase
+      const { data: complexes } = await (supabase
         .from('complexes')
         .select('id')
-        .eq('owner_id', user.id)
+        .eq('owner_id', user.id) as any)
 
       if (!complexes || complexes.length === 0) {
         setLoading(false)
         return
       }
 
-      const complexIds = complexes.map((c) => c.id)
+      const complexIds = (complexes as any[]).map((c) => c.id)
 
       // Get tournaments for those complexes
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from('tournaments')
         .select(`
           *,
@@ -53,7 +53,7 @@ export default function TournamentsPage() {
           pairs (id)
         `)
         .in('complex_id', complexIds)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }) as any)
 
       if (error) throw error
       setTournaments(data || [])
@@ -76,32 +76,8 @@ export default function TournamentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/40 bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="text-xl font-bold">Padel Manager</span>
-            </Link>
-          </div>
-          <nav className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link href="/players">Jugadores</Link>
-            </Button>
-          </nav>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
+    <>
+      <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Mis Torneos</h1>
             <p className="text-muted-foreground">
@@ -158,7 +134,7 @@ export default function TournamentsPage() {
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Categoría:</span>
-                        <span className="font-medium">{getCategoryName(tournament.category)}</span>
+                        <span className="font-medium">{getCategoryName(tournament.category || 0)}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Género:</span>
@@ -186,7 +162,6 @@ export default function TournamentsPage() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+    </>
   )
 }

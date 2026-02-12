@@ -51,7 +51,7 @@ export function LiveBoard({ tournamentId }: LiveBoardProps) {
     <div className="h-full flex flex-col">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
         <div className="flex justify-center mb-6">
-          <TabsList className="grid w-[600px] grid-cols-3 h-14">
+          <TabsList className="grid w-[600px] grid-cols-3 overflow-hidden pb-10">
             <TabsTrigger value="matches" className="text-lg">Partidos</TabsTrigger>
             <TabsTrigger value="standings" className="text-lg">Posiciones</TabsTrigger>
             <TabsTrigger value="bracket" className="text-lg">Cuadro</TabsTrigger>

@@ -42,6 +42,7 @@ export async function updateSession(request: NextRequest) {
     '/register-player/public',
     '/register-player/qr', // Assuming QR page might also need to be public or it redirects to public
     '/live',
+    '/ranking',
   ]
   
   // Auth routes (login, register via auth, etc.) - should redirect to dashboard if already logged in

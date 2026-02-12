@@ -18,8 +18,7 @@ export async function POST(
     }
 
     // Get tournament and verify ownership
-    const { data: tournament, error: tournamentError } = await supabase
-      .from('tournaments')
+    const { data: tournament, error: tournamentError } = await (supabase as any).from('tournaments')
       .select(`
         *,
         complex:complexes (
@@ -50,8 +49,7 @@ export async function POST(
     }
 
     // Check if zones already exist for this tournament
-    const { data: existingZones, error: existingZonesError } = await supabase
-      .from('zones')
+    const { data: existingZones, error: existingZonesError } = await (supabase as any).from('zones')
       .select('id')
       .eq('tournament_id', tournamentId)
       .limit(1)
@@ -68,8 +66,7 @@ export async function POST(
     }
 
     // Get all pairs for this tournament
-    const { data: pairs, error: pairsError } = await supabase
-      .from('pairs')
+    const { data: pairs, error: pairsError } = await (supabase as any).from('pairs')
       .select('*')
       .eq('tournament_id', tournamentId)
       .order('created_at', { ascending: true })
@@ -98,8 +95,7 @@ export async function POST(
       })
     }
 
-    const { data: createdZones, error: zonesError } = await supabase
-      .from('zones')
+    const { data: createdZones, error: zonesError } = await (supabase as any).from('zones')
       .insert(zonesData)
       .select()
 
@@ -119,8 +115,7 @@ export async function POST(
         }))
 
         for (const update of pairUpdates) {
-          const { error: pairUpdateError } = await supabase
-            .from('pairs')
+          const { error: pairUpdateError } = await (supabase as any).from('pairs')
             .update({ zone_id: update.zone_id })
             .eq('id', update.id)
 
@@ -159,8 +154,7 @@ export async function POST(
 
     // Insert matches
     if (allMatches.length > 0) {
-      const { data: createdMatches, error: matchesError } = await supabase
-        .from('matches')
+      const { data: createdMatches, error: matchesError } = await (supabase as any).from('matches')
         .insert(allMatches)
         .select()
 
@@ -185,8 +179,7 @@ export async function POST(
 
         // Update matches with scheduled times and court numbers
         for (const scheduled of scheduledMatches) {
-          const { error: scheduleError } = await supabase
-            .from('matches')
+          const { error: scheduleError } = await (supabase as any).from('matches')
             .update({ 
               scheduled_time: scheduled.scheduledTime.toISOString(),
               court_number: scheduled.courtNumber
@@ -201,8 +194,7 @@ export async function POST(
     }
 
     // Update tournament status to 'zones'
-    const { error: updateError } = await supabase
-      .from('tournaments')
+    const { error: updateError } = await (supabase as any).from('tournaments')
       .update({ status: 'zones' })
       .eq('id', tournamentId)
 

@@ -51,7 +51,7 @@ export function EditMatchTime({ matchId, currentTime, currentCourt, onSuccess }:
       // Combine date and time
       const scheduledTime = new Date(`${formData.date}T${formData.time}:00`)
       
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('matches')
         .update({ 
           scheduled_time: scheduledTime.toISOString(),

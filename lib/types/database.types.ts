@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       complexes: {
@@ -15,6 +15,7 @@ export interface Database {
           name: string
           owner_id: string
           location: string | null
+          logo_url: string | null
           created_at: string
           updated_at: string
         }
@@ -23,6 +24,7 @@ export interface Database {
           name: string
           owner_id: string
           location?: string | null
+          logo_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -31,6 +33,7 @@ export interface Database {
           name?: string
           owner_id?: string
           location?: string | null
+          logo_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -44,6 +47,7 @@ export interface Database {
           last_name: string
           phone: string | null
           photo_url: string | null
+          gender: 'Masculino' | 'Femenino' | null
           current_category: number | null
           created_at: string
           updated_at: string
@@ -56,6 +60,7 @@ export interface Database {
           last_name: string
           phone?: string | null
           photo_url?: string | null
+          gender?: 'M' | 'F' | null
           current_category?: number | null
           created_at?: string
           updated_at?: string
@@ -68,6 +73,7 @@ export interface Database {
           last_name?: string
           phone?: string | null
           photo_url?: string | null
+          gender?: 'M' | 'F' | null
           current_category?: number | null
           created_at?: string
           updated_at?: string
@@ -104,6 +110,7 @@ export interface Database {
           category: number | null
           gender: 'Masculino' | 'Femenino' | 'Mixto' | null
           status: 'registration' | 'zones' | 'playoffs' | 'finished'
+          total_points: number | null
           max_pairs: number | null
           start_date: string | null
           end_date: string | null
@@ -111,6 +118,8 @@ export interface Database {
           daily_end_time: string | null
           match_duration_minutes: number | null
           available_courts: number | null
+          registration_price: number
+          ranking_definition_id: string | null
           created_at: string
           updated_at: string
         }
@@ -121,6 +130,7 @@ export interface Database {
           category?: number | null
           gender?: 'Masculino' | 'Femenino' | 'Mixto' | null
           status?: 'registration' | 'zones' | 'playoffs' | 'finished'
+          total_points?: number | null
           max_pairs?: number | null
           start_date?: string | null
           end_date?: string | null
@@ -128,6 +138,8 @@ export interface Database {
           daily_end_time?: string | null
           match_duration_minutes?: number | null
           available_courts?: number | null
+          registration_price?: number
+          ranking_definition_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -138,6 +150,7 @@ export interface Database {
           category?: number | null
           gender?: 'Masculino' | 'Femenino' | 'Mixto' | null
           status?: 'registration' | 'zones' | 'playoffs' | 'finished'
+          total_points?: number | null
           max_pairs?: number | null
           start_date?: string | null
           end_date?: string | null
@@ -145,6 +158,8 @@ export interface Database {
           daily_end_time?: string | null
           match_duration_minutes?: number | null
           available_courts?: number | null
+          registration_price?: number
+          ranking_definition_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -158,6 +173,8 @@ export interface Database {
           zone_id: string | null
           has_bye: boolean
           seed: number | null
+          player1_paid: boolean
+          player2_paid: boolean
           created_at: string
         }
         Insert: {
@@ -168,6 +185,8 @@ export interface Database {
           zone_id?: string | null
           has_bye?: boolean
           seed?: number | null
+          player1_paid?: boolean
+          player2_paid?: boolean
           created_at?: string
         }
         Update: {
@@ -178,6 +197,8 @@ export interface Database {
           zone_id?: string | null
           has_bye?: boolean
           seed?: number | null
+          player1_paid?: boolean
+          player2_paid?: boolean
           created_at?: string
         }
       }
@@ -263,12 +284,41 @@ export interface Database {
           created_at?: string
         }
       }
+      ranking_definitions: {
+        Row: {
+          id: string
+          complex_id: string
+          name: string
+          category: number
+          base_points: number
+          points_distribution: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          complex_id: string
+          name: string
+          category: number
+          base_points?: number
+          points_distribution?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          complex_id?: string
+          name?: string
+          category?: number
+          base_points?: number
+          points_distribution?: Json
+          created_at?: string
+        }
+      }
       rankings: {
         Row: {
           id: string
           player_id: string
           category: number
-          season_year: number
+          ranking_definition_id: string
           total_points: number
           tournaments_played: number
           updated_at: string
@@ -277,7 +327,7 @@ export interface Database {
           id?: string
           player_id: string
           category: number
-          season_year: number
+          ranking_definition_id: string
           total_points?: number
           tournaments_played?: number
           updated_at?: string
@@ -286,7 +336,7 @@ export interface Database {
           id?: string
           player_id?: string
           category?: number
-          season_year?: number
+          ranking_definition_id?: string
           total_points?: number
           tournaments_played?: number
           updated_at?: string
@@ -330,6 +380,20 @@ export interface Database {
           complex_location: string
         }
         Returns: string
+      }
+      search_players_unaccent: {
+        Args: {
+          search_term: string
+        }
+        Returns: {
+          id: string
+          first_name: string
+          last_name: string
+          dni: string
+          photo_url: string | null
+          current_category: number | null
+          gender: string | null
+        }[]
       }
     }
     Enums: {

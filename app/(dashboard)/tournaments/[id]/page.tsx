@@ -13,10 +13,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import { GenerateZonesButton } from '@/components/tournaments/generate-zones-button'
 import { GeneratePlayoffsButton } from '@/components/tournaments/generate-playoffs-button'
+import { FinishTournamentButton } from '@/components/tournaments/finish-tournament-button'
+
 import { DeletePairButton } from '@/components/tournaments/delete-pair-button'
 import { ZonesDisplay } from '@/components/tournaments/zones-display'
 import { MatchesDisplay } from '@/components/tournaments/matches-display'
 import { PlayoffBracket } from '@/components/tournaments/playoff-bracket'
+import { RegistrationsDisplay } from '@/components/tournaments/registrations-display'
 import { TournamentQRDialog } from '@/components/tournament/tournament-qr-dialog'
 import type { Tournament, Pair, Player } from '@/lib/types'
 
@@ -26,6 +29,10 @@ type TournamentWithComplex = Tournament & {
     name: string
     location: string | null
   }
+  ranking_definitions: {
+    id: string
+    name: string
+  } | null
 }
 
 type PairWithPlayers = Pair & {
@@ -42,8 +49,10 @@ export default function TournamentDetailPage() {
   const [pairs, setPairs] = useState<PairWithPlayers[]>([])
   const [hasPlayoffs, setHasPlayoffs] = useState(false)
   const [allZoneMatchesCompleted, setAllZoneMatchesCompleted] = useState(false)
+  const [allPlayoffMatchesCompleted, setAllPlayoffMatchesCompleted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState('pairs')
 
   useEffect(() => {
     loadTournamentData()
@@ -62,6 +71,10 @@ export default function TournamentDetailPage() {
             id,
             name,
             location
+          ),
+          ranking_definitions (
+            id,
+            name
           )
         `)
         .eq('id', tournamentId)
@@ -105,6 +118,18 @@ export default function TournamentDetailPage() {
       const allCompleted = Boolean(zoneMatches && zoneMatches.length > 0 && 
         zoneMatches.every(match => match.status === 'completed' || match.status === 'walkover'))
       setAllZoneMatchesCompleted(allCompleted)
+
+      // Check if all playoff matches are completed
+      const { data: allPlayoffMatches } = await supabase
+        .from('matches')
+        .select('id, status')
+        .eq('tournament_id', tournamentId)
+        .eq('phase', 'playoffs')
+        .returns<{ id: string, status: string }[]>()
+
+      const allPlayoffsCompleted = Boolean(allPlayoffMatches && allPlayoffMatches.length > 0 && 
+        allPlayoffMatches.every(match => match.status === 'completed' || match.status === 'walkover'))
+      setAllPlayoffMatchesCompleted(allPlayoffsCompleted)
     } catch (err: any) {
       console.error('Error loading tournament:', err)
       setError(err.message)
@@ -124,7 +149,22 @@ export default function TournamentDetailPage() {
     return <Badge variant={config.variant}>{config.label}</Badge>
   }
 
+  // Calculate registration stats
+  const totalPlayers = pairs.length * 2
+  const paidPlayers = pairs.reduce((acc, pair) => {
+    return acc + (pair.player1_paid ? 1 : 0) + (pair.player2_paid ? 1 : 0)
+  }, 0)
+  const participationPercentage = totalPlayers > 0 ? Math.round((paidPlayers / totalPlayers) * 100) : 0
+  
+  // Define color for the indicator based on percentage
+  const getProgressColor = (percent: number) => {
+    if (percent === 100) return 'bg-green-500'
+    if (percent >= 50) return 'bg-yellow-500'
+    return 'bg-red-500'
+  }
+
   if (loading) {
+    // ... same loading ...
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -137,60 +177,24 @@ export default function TournamentDetailPage() {
 
   if (error || !tournament) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border/40 bg-card">
-          <div className="container mx-auto px-4 py-4">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="text-xl font-bold">Padel Manager</span>
-            </Link>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 py-8">
-          <Card className="max-w-2xl mx-auto">
-            <CardContent className="pt-6 text-center">
-              <h2 className="text-2xl font-bold mb-4">Torneo no encontrado</h2>
-              <p className="text-muted-foreground mb-6">{error || 'El torneo que buscas no existe'}</p>
-              <Button asChild>
-                <Link href="/dashboard">Volver al Dashboard</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </main>
+      <div className="max-w-2xl mx-auto mt-8">
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <h2 className="text-2xl font-bold mb-4">Torneo no encontrado</h2>
+            <p className="text-muted-foreground mb-6">{error || 'El torneo que buscas no existe'}</p>
+            <Button asChild>
+              <Link href="/dashboard">Volver al Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/40 bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="text-xl font-bold">Padel Manager</span>
-            </Link>
-          </div>
-          <nav className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link href="/tournaments">Torneos</Link>
-            </Button>
-          </nav>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Tournament Header */}
-        <div className="mb-8">
+    <>
+      {/* Tournament Header */}
+      <div className="mb-8">
           <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
             ← Volver al dashboard
           </Link>
@@ -228,7 +232,7 @@ export default function TournamentDetailPage() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="pairs" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="pairs">
               Parejas ({pairs.length}{tournament.max_pairs ? `/${tournament.max_pairs}` : ''})
@@ -244,6 +248,13 @@ export default function TournamentDetailPage() {
                 Playoffs
               </TabsTrigger>
             )}
+            <TabsTrigger value="registrations" className="flex items-center gap-2">
+              Inscripciones
+              <div 
+                className={`h-2 w-2 rounded-full ${getProgressColor(participationPercentage)}`} 
+                title={`${participationPercentage}% pagado`}
+              />
+            </TabsTrigger>
             <TabsTrigger value="settings">
               Configuración
             </TabsTrigger>
@@ -330,10 +341,13 @@ export default function TournamentDetailPage() {
                 {tournament.status === 'registration' && pairs.length >= 4 && (
                   <div className="mt-6 pt-6 border-t">
                     <GenerateZonesButton 
-                    tournamentId={tournamentId} 
-                    pairsCount={pairs.length}
-                    onSuccess={loadTournamentData} 
-                  />
+                      tournamentId={tournamentId} 
+                      pairsCount={pairs.length}
+                      onSuccess={() => {
+                        loadTournamentData()
+                        setActiveTab('matches')
+                      }} 
+                    />
                   </div>
                 )}
               </CardContent>
@@ -391,6 +405,14 @@ export default function TournamentDetailPage() {
             </TabsContent>
           )}
 
+          {/* Registrations Tab */}
+          <TabsContent value="registrations">
+            <RegistrationsDisplay 
+              tournamentId={tournamentId} 
+              registrationPrice={tournament.registration_price || 0} 
+            />
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings">
             <Card>
@@ -427,14 +449,51 @@ export default function TournamentDetailPage() {
                         ? new Date(tournament.end_date).toLocaleDateString('es-AR')
                         : 'No definida'}
                     </p>
+                    <div>
+                    <Label className="text-sm font-medium">Ranking Asignado</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {tournament.ranking_definitions ? (
+                        <Link href={`/rankings/${tournament.ranking_definitions.id}`} className="hover:underline text-primary">
+                          {tournament.ranking_definitions.name}
+                        </Link>
+                      ) : (
+                        'No suma puntos'
+                      )}
+                    </p>
+                  </div>
+                  {tournament.ranking_definitions && (
+                    <div>
+                      <Label className="text-sm font-medium">Puntos del Torneo</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {tournament.total_points || 0} puntos base
+                      </p>
+                    </div>
+                  )}
+                </div>
+                </div>
+
+                {tournament.status !== 'finished' && (
+                <div className="mt-8 pt-6 border-t flex flex-col gap-4">
+                  <h3 className="text-lg font-medium text-destructive">Zona de Peligro</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Estas acciones son irreversibles y afectarán el estado del torneo y rankings.
+                  </p>
+                  <div className="flex justify-start gap-4">
+                    <FinishTournamentButton 
+                      tournamentId={tournament.id} 
+                      hasRanking={!!tournament.ranking_definition_id}
+                      allMatchesCompleted={allPlayoffMatchesCompleted}
+                    />
                   </div>
                 </div>
+                )}
+
+
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+    </>
   )
 }
 

@@ -19,28 +19,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/40 bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-foreground">P</span>
-            </div>
-            <span className="text-xl font-bold">Padel Manager</span>
-          </div>
-          <nav className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/">Inicio</Link>
-            </Button>
-            <Button variant="outline" onClick={handleSignOut}>Cerrar Sesión</Button>
-          </nav>
-        </div>
-      </header>
-
+    <div className="bg-background">
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+      <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
           <p className="text-muted-foreground">
             Gestiona tus torneos, jugadores y rankings
@@ -112,10 +93,9 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          <TournamentsSection />
+      <TournamentsSection />
         </div>
-      </main>
-    </div>
+      </div>
   )
 }
 
