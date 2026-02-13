@@ -22,7 +22,7 @@ export default async function DashboardLayout({
     .single() as any)
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <DashboardHeader 
         complexName={complex?.name} 
         logoUrl={complex?.logo_url} 

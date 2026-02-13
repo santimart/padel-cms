@@ -45,7 +45,7 @@ export default function QRGeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="border-b border-border/40 bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

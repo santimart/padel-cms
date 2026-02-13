@@ -31,33 +31,36 @@ export function LiveStandings({ pairs, matches }: LiveStandingsProps) {
   }).sort((a, b) => a.name.localeCompare(b.name))
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 p-3 max-w-[1400px] mx-auto  bg-card rounded-xl">
       {zonesData.map(zone => (
-        <Card key={zone.name} className="border-primary/20 shadow-md">
-          <CardHeader className="bg-secondary/20 pb-2">
-            <CardTitle className="text-xl text-primary font-bold text-center">ZONA {zone.name}</CardTitle>
+        <Card 
+          key={zone.name} 
+          className="rounded-none shadow-none border-0 border-b border-border last:border-b-0 md:odd:border-r md:odd:border-border md:[&:nth-last-child(-n+2)]:border-b-0 gap-0"
+        >
+          <CardHeader className=" pt-4 gap-0">
+            <CardTitle className="text-xl text-primary uppercase tracking-wider text-center">ZONA {zone.name}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-10 text-center font-bold text-foreground">#</TableHead>
-                  <TableHead className="font-bold text-foreground">Pareja</TableHead>
-                  <TableHead className="text-center font-bold text-foreground">PJ</TableHead>
-                  <TableHead className="text-center font-bold text-foreground">Pts</TableHead>
+                <TableRow className="hover:bg-transparent uppercase">
+                  <TableHead className="w-10 text-center  text-foreground">#</TableHead>
+                  <TableHead className="text-foreground">Pareja</TableHead>
+                  <TableHead className="text-center text-foreground">PJ</TableHead>
+                  <TableHead className="text-center text-foreground">Pts</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {zone.standings.map((standing, index) => (
-                  <TableRow key={standing.pairId} className={index < 2 ? 'bg-primary/5' : ''}>
-                    <TableCell className="text-center font-bold text-lg">
+                  <TableRow key={standing.pairId} className={`border-none ${index < 2 ? '' : ''}`}>
+                    <TableCell className={`text-center font-bold text-lg ${index >= 2 ? 'opacity-50' : ''}`}>
                       {standing.position}
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium text-base truncate max-w-[150px]">
+                      <div className={`font-medium text-base truncate max-w-[150px] ${index >= 2 ? 'opacity-50' : ''}`}>
                         {formatName(standing.pair.player1.first_name)} {formatName(standing.pair.player1.last_name)}
                       </div>
-                      <div className="font-medium text-base truncate max-w-[150px]">
+                      <div className={`font-medium text-base truncate max-w-[150px] ${index >= 2 ? 'opacity-50' : ''}`}>
                         {formatName(standing.pair.player2.first_name)} {formatName(standing.pair.player2.last_name)}
                       </div>
                     </TableCell>

@@ -9,6 +9,64 @@ interface LiveMatchListProps {
   matches: MatchDetailed[]
 }
 
+function ScoreBadge({ score, opponentScore }: { score: number | undefined, opponentScore: number | undefined }) {
+  const isWinner = (score || 0) > (opponentScore || 0)
+  
+  return (
+    <span className={`px-3 py-1 rounded min-w-[30px] text-center font-mono font-light text-4xl ${
+      isWinner ? 'text-foreground' : 'text-foreground/50'
+    }`}>
+      {score ?? '-'}
+    </span>
+  )
+}
+
+function PairRow({ 
+  pair, 
+  isWinner, 
+  scores, 
+  opponentScores, 
+  setsCount, 
+  showScore,
+  className 
+}: { 
+  pair: MatchDetailed['pair1'], 
+  isWinner: boolean, 
+  scores: number[], 
+  opponentScores: number[], 
+  setsCount: number, 
+  showScore: boolean,
+  className?: string
+}) {
+  return (
+    <div className={`flex justify-between items-center ${className || ''}`}>
+        <div className={`text-md truncate pr-4 text-foreground ${isWinner ? 'font-semibold' : 'font-normal'}`}>
+            {formatName(pair?.player1?.first_name)} {formatName(pair?.player1?.last_name)}
+            <br/>
+            {formatName(pair?.player2?.first_name)} {formatName(pair?.player2?.last_name)}
+        </div>
+        {/* Score */}
+         <div className="flex gap-2">
+             {showScore && (
+                 <div className="flex gap-1 text-lg font-mono font-bold">
+                   
+                    {/* Show games for each set */}
+                    {Array.from({ length: setsCount }).map((_, i) => (
+                       <React.Fragment key={i}>
+                         <ScoreBadge 
+                           score={scores[i]} 
+                           opponentScore={opponentScores[i]} 
+                         />
+                        {/* separator line */}
+                       </React.Fragment>
+                    ))}
+                 </div>
+             )}
+         </div>
+    </div>
+  )
+}
+
 interface CarouselSectionProps {
   title: string
   matches: MatchDetailed[]
@@ -61,7 +119,7 @@ function CarouselSection({ title, matches, icon, emptyMessage, status }: Carouse
   if (matches.length === 0) {
     return (
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold flex items-center text-primary uppercase tracking-wider">
+        <h2 className="text-3xl flex items-center text-foreground capitalize">
           {icon} {title}
         </h2>
         <p className="text-muted-foreground text-lg">{emptyMessage}</p>
@@ -71,7 +129,7 @@ function CarouselSection({ title, matches, icon, emptyMessage, status }: Carouse
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold flex items-center text-primary uppercase tracking-wider">
+      <h2 className="text-3xl  flex items-center text-foreground capitalize">
         {icon} {title}
       </h2>
       
@@ -148,78 +206,63 @@ function LiveMatchCard({ match, status }: { match: MatchDetailed, status: 'playi
   
   // Determine how many sets to show (max of p1 or p2 length)
   const setsCount = Math.max(pair1Games.length, pair2Games.length)
+  const showScore = match.status === 'completed' || match.status === 'in_progress'
 
   return (
-    <Card className={`overflow-hidden p-0 ${isPlaying ? 'border-primary border-2 shadow-lg shadow-primary/10' : 'border-border'}`}>
+    <Card className={`bg-white/80 border border-white overflow-hidden p-0 rounded-4xl ${isPlaying ? 'border-primary border-2 ' : ''}`}>
       <CardContent className="p-6">
-        <div className="flex justify-between items-center mb-4">
-           <div className="flex flex-col gap-1">
-             <div className="flex gap-2">
-                <div className="text-sm font-medium text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full uppercase tracking-wider">
+        <div className="flex justify-between items-center mb-6">
+           <div className="flex flex-col gap-1 w-full">
+             <div className="flex gap-3 items-center justify-start">
+
+                <div className="text-sm font-semibold text-primary uppercase">
                     {match.zone?.name ? `Zona ${match.zone.name}` : (match.round || 'Partido')}
                 </div>
+                <span className='w-[10px] h-px bg-primary rounded-full' />
+              
                 {match.scheduled_time && (
-                    <div className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full flex items-center gap-1">
-                        <ClockIcon className="w-3 h-3" />
-                        {new Date(match.scheduled_time).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
+                    <div className="text-sm font-semibold text-primary flex gap-1 items-center uppercase">
+                        {/* <ClockIcon className="w-3 h-3" /> */}
+                        {new Date(match.scheduled_time).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}hs
                     </div>
                 )}
-             </div>
-           </div>
-           {match.court_number && (
-             <div className="text-base font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
+                <span className='w-[10px] h-px bg-primary rounded-full' />
+
+              {match.court_number && (
+             <div className="text-sm font-semibold text-primary uppercase">
                Cancha {match.court_number}
              </div>
-           )}
+           )}                
+             </div>
+             
+
+           </div>
+
         </div>
 
         {/* Pair 1 */}
-        <div className="flex justify-between items-center mb-3">
-            <div className={`text-lg font-bold truncate pr-4 ${match.winner_id === match.pair1_id ? 'text-green-500' : ''}`}>
-                {formatName(match.pair1?.player1?.first_name)} {formatName(match.pair1?.player1?.last_name)}
-                <br/>
-                {formatName(match.pair1?.player2?.first_name)} {formatName(match.pair1?.player2?.last_name)}
-            </div>
-            {/* Score P1 */}
-             <div className="flex gap-2">
-                 {(match.status === 'completed' || match.status === 'in_progress') && (
-                     <div className="flex gap-1 text-lg font-mono font-bold">
-                        {/* Show games for each set */}
-                        {Array.from({ length: setsCount }).map((_, i) => (
-                           <span key={i} className={`px-3 py-1 rounded min-w-[30px] text-center ${
-                             (pair1Games[i] > pair2Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
-                           }`}>
-                             {pair1Games[i] ?? '-'}
-                           </span>
-                        ))}
-                     </div>
-                 )}
-             </div>
-        </div>
+        <PairRow 
+            pair={match.pair1}
+            isWinner={match.winner_id === match.pair1_id}
+            scores={pair1Games}
+            opponentScores={pair2Games}
+            setsCount={setsCount}
+            showScore={showScore}
+        />
+
+        {/* Separator center line*/}
+        <div className="w-full h-px bg-border/50 my-4" />
+        
 
         {/* Pair 2 */}
-        <div className="flex justify-between items-center">
-             <div className={`text-lg font-bold truncate pr-4 ${match.winner_id === match.pair2_id ? 'text-green-500' : ''}`}>
-                {formatName(match.pair2?.player1?.first_name)} {formatName(match.pair2?.player1?.last_name)}
-                <br/>
-                {formatName(match.pair2?.player2?.first_name)} {formatName(match.pair2?.player2?.last_name)}
-            </div>
-             {/* Score P2 */}
-             <div className="flex gap-2">
-                 {(match.status === 'completed' || match.status === 'in_progress') && (
-                     <div className="flex gap-1 text-lg font-mono font-bold">
-                        {/* Show games for each set */}
-                         {Array.from({ length: setsCount }).map((_, i) => (
-                           <span key={i} className={`px-3 py-1 rounded min-w-[30px] text-center ${
-                             (pair2Games[i] > pair1Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
-                           }`}>
-                             {pair2Games[i] ?? '-'}
-                           </span>
-                        ))}
-                     </div>
-                 )}
-             </div>
-        </div>
+        <PairRow 
+            pair={match.pair2}
+            isWinner={match.winner_id === match.pair2_id}
+            scores={pair2Games}
+            opponentScores={pair1Games}
+            setsCount={setsCount}
+            showScore={showScore}
+        />
         
         {/* Live indicator details */}
         {isPlaying && (

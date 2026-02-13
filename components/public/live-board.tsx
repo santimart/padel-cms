@@ -46,15 +46,29 @@ export function LiveBoard({ tournamentId }: LiveBoardProps) {
   // Inject current time into the header (using a portal or just knowing this component is inside the main area)
   // Actually, we can just display the clock here or let the parent handle it. The parent has a placeholder.
   // For now, let's focus on the content.
+  // For now, let's focus on the content.
+  const tabStyles = `text-lg rounded-full py-1 px-0
+  cursor-pointer
+  uppercase
+  rounded-none
+  tracking-wider
+  border-none
+  
+  text-foreground
+  data-[state=active]:border-primary
+  data-[state=active]:text-primary
+  data-[state=active]:border-b-2
+    data-[state=active]:border
+  hover:text-primary transition-all`
 
   return (
     <div className="h-full flex flex-col">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-        <div className="flex justify-center mb-6">
-          <TabsList className="grid w-[600px] grid-cols-3 overflow-hidden pb-10">
-            <TabsTrigger value="matches" className="text-lg">Partidos</TabsTrigger>
-            <TabsTrigger value="standings" className="text-lg">Posiciones</TabsTrigger>
-            <TabsTrigger value="bracket" className="text-lg">Cuadro</TabsTrigger>
+        <div className="flex justify-center mb-6 h-[70px]">
+          <TabsList className="grid w-[350px] grid-cols-3 pb-10 bg-transparent overflow-visible gap-4">
+            <TabsTrigger value="matches" className={tabStyles}>Partidos</TabsTrigger>
+            <TabsTrigger value="standings" className={tabStyles}>Zonas</TabsTrigger>
+            <TabsTrigger value="bracket" className={tabStyles}>Cuadro</TabsTrigger>
           </TabsList>
         </div>
 

@@ -121,7 +121,7 @@ export default function PublicRegisterPlayerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">

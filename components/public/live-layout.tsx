@@ -51,10 +51,10 @@ export function LiveLayout({ tournament, children }: LiveLayoutProps) {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
+    <div className="flex flex-col h-screen text-foreground overflow-hidden">
       {/* Header */}
       {!isFullscreen && (
-        <header className="flex items-center justify-between px-6 py-4 bg-card border-b border-border/40 shadow-sm z-10 transition-all duration-300">
+        <header className="flex items-center justify-between px-6 py-4  z-10 transition-all duration-300 mb-10">
           <div className="flex items-center gap-4">
             {tournament.complexes?.logo_url ? (
               // eslint-disable-next-line @next/next/no-img-element

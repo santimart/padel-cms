@@ -32,7 +32,7 @@ export function LiveBracket({ matches }: LiveBracketProps) {
   // For now, let's use flex columns which is readable enough on TV.
 
   return (
-    <div className="flex gap-12 p-4 overflow-x-auto min-w-full min-h-full">
+    <div className="flex gap-12 p-4 overflow-x-auto min-w-full min-h-full justify-center">
       {sortedRounds.map(round => {
         // Sort matches by bracket_position
         const roundMatches = playoffMatches
@@ -41,7 +41,7 @@ export function LiveBracket({ matches }: LiveBracketProps) {
         
         return (
           <div key={round} className="min-w-[300px] flex flex-col gap-4">
-             <div className="text-center py-2 bg-primary/10 rounded font-bold text-xl uppercase tracking-widest text-primary sticky top-0 z-10 backdrop-blur-sm shadow-sm">
+             <div className="text-center py-2 rounded  text-xl uppercase tracking-widest text-primary sticky top-0 z-10 ">
                {ROUND_LABELS[round] || round}
              </div>
              
@@ -85,8 +85,8 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
     <Card className="border-border shadow-sm min-w-[280px]">
       <CardContent className="p-3">
         {/* Pair 1 */}
-        <div className={`flex justify-between items-center p-2 rounded ${winnerId === match.pair1_id ? 'bg-green-500/10' : ''} ${p1Lost ? 'opacity-50' : ''}`}>
-           <div className={`text-sm font-bold truncate flex-1 pr-2 ${winnerId === match.pair1_id ? 'text-green-500' : ''}`}>
+        <div className={`flex justify-between items-center p-2 rounded ${winnerId === match.pair1_id ? '' : ''} ${p1Lost ? 'opacity-50' : ''}`}>
+           <div className={`text-md truncate flex-1 pr-2 ${winnerId === match.pair1_id ? '' : ''}`}>
                {match.pair1 ? (
                    <span className="flex flex-col">
                     <span>{formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)}</span>
@@ -100,8 +100,8 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
            <div className="flex items-center gap-3">
              <div className="flex gap-2 text-foreground font-mono font-bold">
                 {p1Games.map((g, i) => (
-                  <span key={i} className={`px-2 py-0.5 rounded text-center min-w-[24px] ${
-                      (p1Games[i] > p2Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                  <span key={i} className={`px-2 py-0.5 rounded-full text-center min-w-[24px] min-h-[24px] ${
+                      (p1Games[i] > p2Games[i]) ? 'border-primary border-2 text-primary' : 'bg-secondary'
                   }`}>
                       {g}
                   </span>
@@ -114,7 +114,7 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
 
         {/* Pair 2 */}
         <div className={`flex justify-between items-center p-2 rounded ${winnerId === match.pair2_id ? 'bg-green-500/10' : ''} ${p2Lost ? 'opacity-50' : ''}`}>
-           <div className={`text-sm font-bold truncate flex-1 pr-2 ${winnerId === match.pair2_id ? 'text-green-500' : ''}`}>
+           <div className={`text-md truncate flex-1 pr-2 ${winnerId === match.pair2_id ? 'text-green-500' : ''}`}>
                 {match.pair2 ? (
                    <span className="flex flex-col">
                     <span>{formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)}</span>
@@ -128,8 +128,8 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
            <div className="flex items-center gap-3">
              <div className="flex gap-2 text-foreground font-mono font-bold">
                 {p2Games.map((g, i) => (
-                  <span key={i} className={`px-2 py-0.5 rounded text-center min-w-[24px] ${
-                      (p2Games[i] > p1Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                  <span key={i} className={`px-2 py-0.5 rounded text-center min-w-[24px] min-h-[24px] ${
+                      (p2Games[i] > p1Games[i]) ? 'border-primary border-2 text-primary' : ''
                   }`}>
                       {g}
                   </span>
