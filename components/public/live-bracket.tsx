@@ -32,7 +32,7 @@ export function LiveBracket({ matches }: LiveBracketProps) {
   // For now, let's use flex columns which is readable enough on TV.
 
   return (
-    <div className="flex gap-12 p-4 overflow-x-auto min-w-full min-h-full justify-center">
+    <div className="flex gap-8 p-4 overflow-x-auto min-w-full min-h-full justify-center">
       {sortedRounds.map(round => {
         // Sort matches by bracket_position
         const roundMatches = playoffMatches
@@ -82,7 +82,7 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
   const p2Games = getGames(match.pair2_games)
 
   return (
-    <Card className="border-border shadow-sm min-w-[280px]">
+    <Card className="border-border min-w-[280px] shadow-none rounded-3xl py-1">
       <CardContent className="p-3">
         {/* Pair 1 */}
         <div className={`flex justify-between items-center p-2 rounded ${winnerId === match.pair1_id ? '' : ''} ${p1Lost ? 'opacity-50' : ''}`}>

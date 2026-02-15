@@ -58,11 +58,11 @@ export function LiveBoard({ tournamentId }: LiveBoardProps) {
   data-[state=active]:border-primary
   data-[state=active]:text-primary
   data-[state=active]:border-b-2
-    data-[state=active]:border
+    data-[state=active]:border-none
   hover:text-primary transition-all`
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col pb-12">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
         <div className="flex justify-center mb-6 h-[70px]">
           <TabsList className="grid w-[350px] grid-cols-3 pb-10 bg-transparent overflow-visible gap-4">
