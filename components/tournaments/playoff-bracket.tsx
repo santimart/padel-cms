@@ -8,6 +8,7 @@ import { PlayoffMatchCard } from './playoff-match-card'
 
 interface PlayoffBracketProps {
   tournamentId: string
+  isEditable?: boolean
 }
 
 const ROUND_LABELS: Record<string, string> = {
@@ -18,7 +19,7 @@ const ROUND_LABELS: Record<string, string> = {
   'F': 'Final',
 }
 
-export function PlayoffBracket({ tournamentId }: PlayoffBracketProps) {
+export function PlayoffBracket({ tournamentId, isEditable = true }: PlayoffBracketProps) {
   const [matches, setMatches] = useState<PlayoffMatch[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedRound, setSelectedRound] = useState<string>('QF')
@@ -129,6 +130,7 @@ export function PlayoffBracket({ tournamentId }: PlayoffBracketProps) {
               key={match.id} 
               match={match} 
               onMatchUpdate={loadPlayoffMatches} 
+              isEditable={isEditable}
             />
           ))}
         </div>

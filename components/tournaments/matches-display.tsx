@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { formatName } from '@/lib/utils'
+import { formatName, formatMatchTime } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { EditMatchTime } from '@/components/tournaments/edit-match-time'
 import { MatchScorer } from '@/components/tournaments/match-scorer'
 import type { Pair, Player } from '@/lib/types'
+import { CalendarIcon } from 'lucide-react'
 
 interface Zone {
   id: string
@@ -48,9 +49,10 @@ type MatchWithPairs = Match & {
 interface MatchesDisplayProps {
   tournamentId: string
   onMatchUpdate?: () => void
+  isEditable?: boolean
 }
 
-export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayProps) {
+export function MatchesDisplay({ tournamentId, onMatchUpdate, isEditable = true }: MatchesDisplayProps) {
   const [matches, setMatches] = useState<MatchWithPairs[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -152,15 +154,7 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayPr
     matchesByZone[zoneName].push(match)
   })
 
-  const formatMatchTime = (dateString: string) => {
-    const date = new Date(dateString)
-    const dayName = date.toLocaleDateString('es-AR', { weekday: 'short' })
-    const dayNum = date.getDate()
-    const month = date.toLocaleDateString('es-AR', { month: 'short' })
-    const time = date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-    
-    return `${dayName} ${dayNum} ${month} - ${time}hs`
-  }
+
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
@@ -179,10 +173,10 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayPr
         <Card key={zoneName}>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Zona {zoneName}</CardTitle>
-              <Badge variant="secondary">{zoneMatches.length} partidos</Badge>
+              <CardTitle className='text-lg tracking-wide'>Zona {zoneName}</CardTitle>
+              {/* <Badge variant="secondary">{zoneMatches.length} partidos</Badge> */}
             </div>
-            <CardDescription>Partidos de la fase de zonas</CardDescription>
+            {/* <CardDescription className='text-md'>Partidos de la fase de zonas</CardDescription> */}
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -194,38 +188,41 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayPr
                   <div className="flex-1">
                     {/* Scheduled time */}
                     {match.scheduled_time && (
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="text-xs text-muted-foreground">
-                          📅 {formatMatchTime(match.scheduled_time)}
+                      <div className="flex items-center gap-6 mb-2">
+                        <div className="text-sm text-primary uppercase font-bold">
+                          <span className='flex items-center gap-2 tracking-wide'>
+                          <CalendarIcon className='w-4 h-4' /> {formatMatchTime(match.scheduled_time)}
                           {match.court_number && ` • Cancha ${match.court_number}`}
+                          </span>
                         </div>
                         <EditMatchTime
                           matchId={match.id}
                           currentTime={match.scheduled_time}
                           currentCourt={match.court_number}
                           onSuccess={loadMatches}
+                          isEditable={isEditable}
                         />
                       </div>
                     )}
                     
                     <div className="flex items-center gap-4">
                       <div className="flex-1">
-                        <div className="font-medium text-sm">
+                        <div className="font-medium text-lg">
                           {formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)} / {formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}
                         </div>
-                        <div className="font-medium text-sm mt-1">
+                        <div className="font-medium text-lg mt-1">
                           {formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)} / {formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}
                         </div>
                       </div>
                       <div className="text-center min-w-[60px]">
                         {match.status === 'completed' ? (
                           <div>
-                            <div className="text-lg font-bold">
+                            <div className="text-xl font-bold">
                               {match.pair1_sets} - {match.pair2_sets}
                             </div>
                             {/* Detailed set scores */}
                             {match.pair1_games && match.pair2_games && (
-                              <div className="text-xs text-muted-foreground mt-1">
+                              <div className="text-md text-muted-foreground mt-1">
                                 {(() => {
                                   try {
                                     const pair1Games = typeof match.pair1_games === 'string' 
@@ -253,7 +250,7 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayPr
                       </div>
                     </div>
                   </div>
-                  <div className="ml-4 flex items-center gap-2">
+                  <div className="ml-4 flex items-center gap-6">
                     <MatchScorer
                       matchId={match.id}
                       pair1Name={`${formatName(match.pair1.player1.first_name)} ${formatName(match.pair1.player1.last_name)} / ${formatName(match.pair1.player2.first_name)} ${formatName(match.pair1.player2.last_name)}`}
@@ -262,6 +259,7 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate }: MatchesDisplayPr
                       pair2Id={match.pair2_id}
                       currentStatus={match.status}
                       onSuccess={loadMatches}
+                      isEditable={isEditable}
                     />
                     {getStatusBadge(match.status)}
                   </div>

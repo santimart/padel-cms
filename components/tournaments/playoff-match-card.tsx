@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Check } from "lucide-react"
+import { Check, CalendarIcon } from "lucide-react"
 import { EditMatchTime } from "./edit-match-time"
 import { MatchScorer } from "./match-scorer"
 import { PlayoffMatch } from "@/lib/types"
@@ -11,9 +11,10 @@ import { formatMatchTime, formatName } from "@/lib/utils"
 interface PlayoffMatchCardProps {
   match: PlayoffMatch
   onMatchUpdate: () => void
+  isEditable?: boolean
 }
 
-export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps) {
+export function PlayoffMatchCard({ match, onMatchUpdate, isEditable = true }: PlayoffMatchCardProps) {
   const isCompleted = match.status === 'completed'
   const pair1Won = match.winner_id === match.pair1_id && match.pair1_id !== null
   const pair2Won = match.winner_id === match.pair2_id && match.pair2_id !== null
@@ -36,29 +37,33 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
       <Card className="mb-3">
         <CardContent className="p-4">
             {/* Scheduled time */}
-          <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+          {/* Scheduled time */}
+          <div className="flex items-center gap-2 mb-3 text-xs">
             {match.scheduled_time ? (
-              <>
-                <span>📅 {formatMatchTime(match.scheduled_time)}</span>
-                {match.court_number && <span>• Cancha {match.court_number}</span>}
-              </>
+               <div className="text-sm text-primary uppercase font-bold">
+                <span className='flex items-center gap-2 tracking-wide'>
+                  <CalendarIcon className='w-4 h-4' /> {formatMatchTime(match.scheduled_time)}
+                  {match.court_number && ` • Cancha ${match.court_number}`}
+                </span>
+              </div>
             ) : (
-              <span>📅 Por definir</span>
+              <span className="text-muted-foreground">📅 Por definir</span>
             )}
             <EditMatchTime
               matchId={match.id}
               currentTime={match.scheduled_time}
               currentCourt={match.court_number}
               onSuccess={onMatchUpdate}
+              isEditable={isEditable}
             />
           </div>
 
           {/* Pair 1 */}
-          <div className={`flex items-center gap-3 p-2 rounded ${pair1Won ? 'bg-primary/5' : ''}`}>
+          <div className={`flex items-center gap-3 p-2 rounded ${pair1Won ? 'bg-secondary/20' : ''}`}>
              <div className="flex-1">
                 {match.pair1 ? (
                    <div className="flex flex-col">
-                     <span className="font-medium">
+                     <span className="text-lg">
                         {formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)} / {formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}
                      </span>
                      {match.pair1.zone?.name && (
@@ -75,8 +80,8 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
              {isCompleted && (
                <div className="flex items-center gap-1">
                  {Array.from({ length: setsCount }).map((_, i) => (
-                    <span key={i} className={`font-mono font-bold text-sm px-2 py-0.5 rounded text-center min-w-[24px] ${
-                      (p1Games[i] > p2Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                    <span key={i} className={`font-reckless text-foreground text-2xl px-2 py-0.5 rounded text-center min-w-[24px] ${
+                      (p1Games[i] > p2Games[i]) ? 'font-bold' : ''
                     }`}>
                       {p1Games[i] ?? '-'}
                     </span>
@@ -90,7 +95,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
              <div className="flex-1">
                  {match.pair2 ? (
                    <div className="flex flex-col">
-                     <span className="font-medium">
+                     <span className="text-lg">
                         {formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)} / {formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}
                      </span>
                      {match.pair2.zone?.name && (
@@ -107,8 +112,8 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
              {isCompleted && (
                <div className="flex items-center gap-1">
                  {Array.from({ length: setsCount }).map((_, i) => (
-                    <span key={i} className={`font-mono font-bold text-sm px-2 py-0.5 rounded text-center min-w-[24px] ${
-                      (p2Games[i] > p1Games[i]) ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                    <span key={i} className={`font-reckless text-foreground text-2xl px-2 py-0.5 rounded text-center min-w-[24px] ${
+                      (p2Games[i] > p1Games[i]) ? 'font-bold' : ''
                     }`}>
                       {p2Games[i] ?? '-'}
                     </span>
@@ -130,6 +135,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate }: PlayoffMatchCardProps
                 phase="playoffs"
                 round={match.round as any} // Cast strict round type if needed by MatchScorer
                 onSuccess={onMatchUpdate}
+                isEditable={isEditable}
               />
             </div>
           )}

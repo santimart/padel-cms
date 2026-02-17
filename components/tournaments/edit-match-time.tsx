@@ -21,9 +21,10 @@ interface EditMatchTimeProps {
   currentTime: string | null
   currentCourt?: number | null
   onSuccess?: () => void
+  isEditable?: boolean
 }
 
-export function EditMatchTime({ matchId, currentTime, currentCourt, onSuccess }: EditMatchTimeProps) {
+export function EditMatchTime({ matchId, currentTime, currentCourt, onSuccess, isEditable = true }: EditMatchTimeProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -71,11 +72,15 @@ export function EditMatchTime({ matchId, currentTime, currentCourt, onSuccess }:
     }
   }
 
+
+
+  if (!isEditable) return null
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-          <Clock className="h-3 w-3 mr-1" />
+        <Button variant="outline" size="sm" className="h-6 px-2 text-xs">
+          {/* <Clock className="h-3 w-3 mr-1" /> */}
           Editar
         </Button>
       </DialogTrigger>

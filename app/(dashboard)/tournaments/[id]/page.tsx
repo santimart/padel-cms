@@ -139,14 +139,14 @@ export default function TournamentDetailPage() {
   }
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-      registration: { label: 'Inscripción Abierta', variant: 'default' },
-      zones: { label: 'Fase de Zonas', variant: 'secondary' },
-      playoffs: { label: 'Playoffs', variant: 'secondary' },
-      finished: { label: 'Finalizado', variant: 'outline' },
+    const variants: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline', className: string }> = {
+      registration: { label: 'Inscripción Abierta', variant: 'default', className: '' },
+      zones: { label: 'Fase de Zonas', variant: 'secondary', className: '' },
+      playoffs: { label: 'Playoffs', variant: 'secondary', className: 'bg-blue-500' },
+      finished: { label: 'Finalizado', variant: 'outline', className: 'bg-primary text-primary-foreground font-bold' },
     }
     const config = variants[status] || { label: status, variant: 'outline' }
-    return <Badge variant={config.variant}>{config.label}</Badge>
+    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>
   }
 
   // Calculate registration stats
@@ -194,22 +194,22 @@ export default function TournamentDetailPage() {
   return (
     <>
       {/* Tournament Header */}
-      <div className="mb-8">
+      <div className="mb-8 border-b border-border py-3 pb-8">
           <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
             ← Volver al dashboard
           </Link>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{tournament.name}</h1>
-              <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
+              <h1 className="text-4xl font-reckless mb-2">{tournament.name}</h1>
+              <div className="flex flex-wrap items-center gap-3 text-foreground uppercase tracking-wider">
                 <span>{tournament.complexes.name}</span>
-                <span>•</span>
+                <span>-</span>
                 <span>{tournament.category ? getCategoryName(tournament.category) : 'Sin categoría'}</span>
-                <span>•</span>
+                <span>-</span>
                 <span>{tournament.gender}</span>
                 {tournament.start_date && (
                   <>
-                    <span>•</span>
+                    <span>-</span>
                     <span>{new Date(tournament.start_date).toLocaleDateString('es-AR')}</span>
                   </>
                 )}
@@ -222,7 +222,7 @@ export default function TournamentDetailPage() {
               />
               <Button variant="outline" size="sm" asChild className="hidden sm:flex">
                 <Link href={`/live/${tournamentId}`} target="_blank">
-                  <ExternalLink className="mr-2 h-4 w-4" />
+                  <ExternalLink className="mr-2 h-2 w-4" />
                   Modo TV (En Vivo)
                 </Link>
               </Button>
@@ -233,7 +233,7 @@ export default function TournamentDetailPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList>
+          <TabsList className='gap-2 bg-transparent'>
             <TabsTrigger value="pairs">
               Parejas ({pairs.length}{tournament.max_pairs ? `/${tournament.max_pairs}` : ''})
             </TabsTrigger>
@@ -309,12 +309,12 @@ export default function TournamentDetailPage() {
                         className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary">
+                          <div className="h-8 w-8 rounded-full flex items-center justify-center font-semibold text-primary font-reckless text-md border-primary border">
                             {index + 1}
                           </div>
                           <div>
-                            <div className="font-medium">
-                              {formatName(pair.player1.first_name)} {formatName(pair.player1.last_name)} / {formatName(pair.player2.first_name)} {formatName(pair.player2.last_name)}
+                            <div className="text-lg">
+                              {formatName(pair.player1.first_name)} {formatName(pair.player1.last_name)} <span className="px-2 opacity-40">/</span> {formatName(pair.player2.first_name)} {formatName(pair.player2.last_name)}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               {pair.player1.current_category && pair.player2.current_category && (
@@ -365,6 +365,7 @@ export default function TournamentDetailPage() {
               <MatchesDisplay 
                 tournamentId={tournamentId} 
                 onMatchUpdate={loadTournamentData}
+                isEditable={tournament.status !== 'finished'}
               />
               
               {/* Generate Playoffs Button */}
@@ -399,7 +400,10 @@ export default function TournamentDetailPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <PlayoffBracket tournamentId={tournamentId} />
+                  <PlayoffBracket 
+                    tournamentId={tournamentId} 
+                    isEditable={tournament.status !== 'finished'}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
