@@ -13,7 +13,7 @@ function ScoreBadge({ score, opponentScore }: { score: number | undefined, oppon
   const isWinner = (score || 0) > (opponentScore || 0)
   
   return (
-    <span className={`px-3 py-1 rounded min-w-[30px] text-center font-mono font-light text-4xl ${
+    <span className={`px-3 py-1 rounded w-[40px] text-center font-normal text-4xl  ${
       isWinner ? 'text-foreground' : 'text-foreground/50'
     }`}>
       {score ?? '-'}
@@ -40,7 +40,7 @@ function PairRow({
 }) {
   return (
     <div className={`flex justify-between items-center ${className || ''}`}>
-        <div className={`text-md truncate pr-4 text-foreground ${isWinner ? 'font-semibold' : 'font-normal'}`}>
+        <div className={`text-md truncate pr-4 text-foreground font-semibold ${isWinner ? '' : 'text-foreground/50'}`}>
             {formatName(pair?.player1?.first_name)} {formatName(pair?.player1?.last_name)}
             <br/>
             {formatName(pair?.player2?.first_name)} {formatName(pair?.player2?.last_name)}
@@ -119,7 +119,7 @@ function CarouselSection({ title, matches, icon, emptyMessage, status }: Carouse
   if (matches.length === 0) {
     return (
       <div className="space-y-4">
-        <h2 className="text-3xl flex items-center text-foreground capitalize">
+        <h2 className="text-4xl flex items-center text-foreground capitalize font-reckless">
           {icon} {title}
         </h2>
         <p className="text-muted-foreground text-lg">{emptyMessage}</p>
@@ -129,7 +129,7 @@ function CarouselSection({ title, matches, icon, emptyMessage, status }: Carouse
 
   return (
     <div className="space-y-4">
-      <h2 className="text-3xl  flex items-center text-foreground capitalize">
+      <h2 className="text-4xl  flex items-center text-foreground capitalize font-reckless">
         {icon} {title}
       </h2>
       

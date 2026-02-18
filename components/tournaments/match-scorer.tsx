@@ -27,6 +27,7 @@ interface MatchScorerProps {
   phase?: string
   round?: string
   onSuccess?: () => void
+  isEditable?: boolean
 }
 
 export function MatchScorer({
@@ -39,6 +40,7 @@ export function MatchScorer({
   phase,
   round,
   onSuccess,
+  isEditable = true,
 }: MatchScorerProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -230,11 +232,12 @@ export function MatchScorer({
 
   const isCompleted = currentStatus === 'completed' || currentStatus === 'walkover'
 
+  if (!isEditable) return null
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={isCompleted ? "outline" : "default"} size="sm">
-          <Trophy className="h-4 w-4 mr-2" />
           {isCompleted ? 'Editar Resultado' : 'Cargar Resultado'}
         </Button>
       </DialogTrigger>

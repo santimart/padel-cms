@@ -120,7 +120,7 @@ export function ZonesDisplay({ tournamentId }: ZonesDisplayProps) {
             </CardHeader>
             <CardContent>
               {zonePairs.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
+                <p className="text-md text-muted-foreground text-center py-4">
                   No hay parejas en esta zona
                 </p>
               ) : (
@@ -130,18 +130,18 @@ export function ZonesDisplay({ tournamentId }: ZonesDisplayProps) {
                       key={pair.id}
                       className="flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                     >
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-sm text-primary">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-lg text-primary font-reckless">
                         {index + 1}
                       </div>
                       <div className="flex-1">
-                        <div className="font-medium text-sm">
+                        <div className="font-medium text-lg">
                           {formatName(pair.player1.first_name)} {formatName(pair.player1.last_name)}
                         </div>
-                        <div className="font-medium text-sm">
+                        <div className="font-medium text-lg">
                           {formatName(pair.player2.first_name)} {formatName(pair.player2.last_name)}
                         </div>
                         {pair.player1.current_category && pair.player2.current_category && (
-                          <div className="text-xs text-muted-foreground mt-1">
+                          <div className="text-md text-muted-foreground mt-1">
                             Cat. {pair.player1.current_category} / {pair.player2.current_category}
                           </div>
                         )}
@@ -158,6 +158,7 @@ export function ZonesDisplay({ tournamentId }: ZonesDisplayProps) {
                     tournamentId={tournamentId}
                     zoneId={zone.id}
                     zoneName={zone.name}
+                    numZones={zones.length}
                   />
                 </div>
               )}

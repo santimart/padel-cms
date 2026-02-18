@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { formatName } from '@/lib/utils'
 import { calculateZoneStandings, formatStandingsRecord, isQualified } from '@/lib/tournament/standings-calculator'
 import type { Pair, Player, Match } from '@/lib/types'
+import { StarIcon } from 'lucide-react'
 
 type PairWithPlayers = Pair & {
   player1: Player
@@ -25,9 +26,10 @@ interface ZoneStandingsProps {
   tournamentId: string
   zoneId: string
   zoneName: string
+  numZones: number
 }
 
-export function ZoneStandings({ tournamentId, zoneId, zoneName }: ZoneStandingsProps) {
+export function ZoneStandings({ tournamentId, zoneId, zoneName, numZones }: ZoneStandingsProps) {
   const [standings, setStandings] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -99,11 +101,11 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName }: ZoneStandingsP
 
   if (loading) {
     return (
-      <Card>
+      <Card className='shadow-none'>
         <CardContent className="pt-6">
           <div className="text-center py-4">
             <div className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-            <p className="mt-2 text-sm text-muted-foreground">Cargando tabla...</p>
+            <p className="mt-2 text-md text-muted-foreground">Cargando tabla...</p>
           </div>
         </CardContent>
       </Card>
@@ -114,7 +116,7 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName }: ZoneStandingsP
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-center text-sm text-muted-foreground py-4">{error}</p>
+          <p className="text-center text-md text-muted-foreground py-4">{error}</p>
         </CardContent>
       </Card>
     )
@@ -127,7 +129,7 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName }: ZoneStandingsP
           <CardTitle className="text-lg">Tabla de Posiciones - Zona {zoneName}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-sm text-muted-foreground py-4">
+          <p className="text-center text-md text-muted-foreground py-4">
             No hay datos de posiciones aún
           </p>
         </CardContent>
@@ -136,14 +138,14 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName }: ZoneStandingsP
   }
 
   return (
-    <Card>
+    <Card className='shadow-none'>
       <CardHeader>
         <CardTitle className="text-lg">Tabla de Posiciones - Zona {zoneName}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className='p-0'>
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className='uppercase'>
               <TableHead className="w-12">Pos</TableHead>
               <TableHead>Pareja</TableHead>
               <TableHead className="text-center">PJ</TableHead>
@@ -155,42 +157,44 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName }: ZoneStandingsP
           </TableHeader>
           <TableBody>
             {standings.map((standing) => {
-              const qualified = isQualified(standing.position, 1) // Assuming we'll get numZones from parent
+              const qualified = isQualified(standing.position, numZones)
               
               return (
-                <TableRow key={standing.pairId} className={qualified ? 'bg-primary/5' : ''}>
-                  <TableCell className="font-medium">
+                <TableRow key={standing.pairId} className={qualified ? 'bg-secondary/20' : ''}>
+                  <TableCell className="font-medium ">
+                    <span className='flex items-center gap-2'>
                     {standing.position}
                     {qualified && (
-                      <Badge variant="default" className="ml-1 text-xs">Q</Badge>
+                      <StarIcon className='w-4 h-4 text-primary' />
                     )}
+                    </span>
                   </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
+                  <TableCell className='py-6'>
+                    <div className="text-lg">
                       {formatName(standing.pair.player1.first_name)} {formatName(standing.pair.player1.last_name)}
                     </div>
-                    <div className="text-sm">
+                    <div className="text-lg">
                       {formatName(standing.pair.player2.first_name)} {formatName(standing.pair.player2.last_name)}
                     </div>
                   </TableCell>
-                  <TableCell className="text-center">{standing.matchesPlayed}</TableCell>
-                  <TableCell className="text-center font-bold">{standing.points}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center text-lg">{standing.matchesPlayed}</TableCell>
+                  <TableCell className="text-center font-bold text-lg ">{standing.points}</TableCell>
+                  <TableCell className="text-center text-lg">
                     {formatStandingsRecord(standing)}
                   </TableCell>
-                  <TableCell className="text-center">
-                    <div className="text-sm">
+                  <TableCell className="text-center text-lg">
+                    <div className="text-lg">
                       {standing.setsWon}-{standing.setsLost}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-lg text-muted-foreground">
                       ({standing.setDifference > 0 ? '+' : ''}{standing.setDifference})
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
-                    <div className="text-sm">
+                    <div className="text-lg">
                       {standing.gamesWon}-{standing.gamesLost}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-lg text-muted-foreground">
                       ({standing.gameDifference > 0 ? '+' : ''}{standing.gameDifference})
                     </div>
                   </TableCell>
@@ -200,7 +204,7 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName }: ZoneStandingsP
           </TableBody>
         </Table>
         
-        <div className="mt-4 text-xs text-muted-foreground">
+        <div className="mt-4 text-md text-muted-foreground">
           <p><strong>PJ:</strong> Partidos Jugados | <strong>Pts:</strong> Puntos | <strong>G-P:</strong> Ganados-Perdidos</p>
           <p><strong>Q:</strong> Clasificado a Playoffs</p>
         </div>

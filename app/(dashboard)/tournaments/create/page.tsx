@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CATEGORIES } from '@/lib/types'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
+import { PageHeader } from '@/components/ui/page-header'
 
 export default function CreateTournamentPage() {
   const router = useRouter()
@@ -187,15 +188,10 @@ export default function CreateTournamentPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-8">
-        <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
-          ← Volver al dashboard
-        </Link>
-        <h1 className="text-3xl font-bold mb-2">Crear Torneo</h1>
-        <p className="text-muted-foreground">
-          Configura un nuevo torneo de pádel para tu complejo
-        </p>
-      </div>
+      <PageHeader
+        title="Crear Torneo"
+        description="Configura un nuevo torneo de pádel para tu complejo"
+      />
 
       <Card>
         <CardHeader>

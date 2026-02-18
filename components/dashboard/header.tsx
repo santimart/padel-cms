@@ -2,11 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/client'
-import { LogOut } from 'lucide-react'
-import { ModeToggle } from '@/components/mode-toggle'
+import { ProfileMenu } from '@/components/dashboard/profile-menu'
 
 interface DashboardHeaderProps {
   complexName?: string
@@ -14,13 +10,6 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) {
-  const router = useRouter()
-
-  const handleSignOut = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
 
   return (
     <header className="sticky top-0 z-50 mb-10">
@@ -47,14 +36,7 @@ export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) 
         </Link>
         
         <nav className="flex items-center gap-4">
-          <Button variant="ghost" asChild className="hidden sm:inline-flex">
-            
-          </Button>
-          <ModeToggle />
-          <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Cerrar Sesión</span>
-          </Button>
+          <ProfileMenu />
         </nav>
       </div>
     </header>

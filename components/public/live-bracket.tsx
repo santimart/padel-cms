@@ -100,7 +100,7 @@ function LiveBracketMatch({ match }: { match: MatchDetailed }) {
            <div className="flex items-center gap-3">
              <div className="flex gap-2 text-foreground font-mono font-bold">
                 {p1Games.map((g, i) => (
-                  <span key={i} className={`px-2 py-0.5 rounded-full text-center min-w-[24px] min-h-[24px] ${
+                  <span key={i} className={`px-2 py-0.5 rounded-full text-center min-w-[24px] min-h-[24px ${
                       (p1Games[i] > p2Games[i]) ? 'border-primary border-2 text-primary' : 'bg-secondary'
                   }`}>
                       {g}
