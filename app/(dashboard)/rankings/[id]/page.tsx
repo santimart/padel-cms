@@ -32,11 +32,11 @@ async function LeaderboardTable({ rankingId }: { rankingId: string }) {
   }
 
   return (
-    <div className="rounded-md border">
+    <div className="">
       <div className="relative w-full overflow-auto">
         <table className="w-full caption-bottom text-sm">
-          <thead className="[&_tr]:border-b">
-            <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+          <thead className="[&_tr]:border-b ">
+            <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted text-md uppercase">
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-16">#</th>
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Jugador</th>
               <th className="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Torneos</th>
@@ -66,15 +66,15 @@ async function LeaderboardTable({ rankingId }: { rankingId: string }) {
                           {player?.first_name?.charAt(0)?.toUpperCase()}{player?.last_name?.charAt(0)?.toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">
+                      <span className="text-lg">
                         {formatName(player?.first_name)} {formatName(player?.last_name)}
                       </span>
                     </div>
                   </td>
-                  <td className="p-4 align-middle text-center">
+                  <td className="p-4 align-middle text-center text-lg">
                     {entry.tournaments_played}
                   </td>
-                  <td className="p-4 align-middle text-right font-bold text-primary">
+                  <td className="p-4 align-middle text-right font-medium text-lg">
                     {entry.total_points}
                   </td>
                 </tr>
@@ -115,8 +115,8 @@ export default async function RankingDetailPage({ params }: { params: Promise<{ 
       <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Tabla de Posiciones</CardTitle>
-            <CardDescription>Clasificación actual del ranking</CardDescription>
+            <CardTitle className="text-xl font-medium">Tabla de Posiciones</CardTitle>
+            <CardDescription className="text-lg">Clasificación actual del ranking</CardDescription>
           </CardHeader>
           <CardContent>
             <Suspense fallback={<div>Cargando posiciones...</div>}>

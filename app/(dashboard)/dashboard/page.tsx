@@ -24,7 +24,7 @@ export default function DashboardPage() {
     <div className="">
       {/* Main Content */}
       <div className="mb-8">
-          <h1 className="text-4xl font-reckless mb-2">Bienvenido al menu de dashboard</h1>
+          <h1 className="text-4xl mb-2">Bienvenido al menu de dashboard</h1>
           {/* <p className="text-muted-foreground">
             Gestiona tus torneos, jugadores y rankings
           </p> */}
@@ -64,7 +64,7 @@ export default function DashboardPage() {
         {/* Tournaments Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Mis Torneos</h2>
+            <h2 className="text-2xl font-medium">Mis Torneos</h2>
             <Button asChild variant="outline">
               <Link href="/tournaments/create">
                 <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

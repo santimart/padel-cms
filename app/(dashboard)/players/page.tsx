@@ -65,7 +65,7 @@ export default function PlayersPage() {
               placeholder="Buscar por nombre, DNI o email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-md"
+              className="max-w-md bg-white dark:bg-black border-2 border-foreground"
             />
           </div>
           <div className="flex gap-2">
