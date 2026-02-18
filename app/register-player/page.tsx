@@ -14,6 +14,7 @@ import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import { useGeoRef, type Province, type Locality } from '@/hooks/use-georef'
 import { Autocomplete } from '@/components/ui/autocomplete'
 import { ModeToggle } from '@/components/mode-toggle'
+import { PageHeader } from '@/components/ui/page-header'
 
 export default function RegisterPlayerPage() {
   const router = useRouter()
@@ -171,20 +172,16 @@ export default function RegisterPlayerPage() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-8">
-            <Link href="/players" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
-              ← Volver a jugadores
-            </Link>
-            <h1 className="text-3xl font-bold mb-2">Registrar Jugador</h1>
-            <p className="text-muted-foreground">
-              Agrega un nuevo jugador a la base de datos global
-            </p>
-          </div>
+          <PageHeader
+            title="Registrar Jugador"
+            description="Agrega un nuevo jugador a la base de datos global"
+            backHref="/players"
+          />
 
           <Card>
             <CardHeader>
-              <CardTitle>Datos del Jugador</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-xl font-medium">Datos del Jugador</CardTitle>
+              <CardDescription className='text-md'>
                 Los campos marcados con * son obligatorios
               </CardDescription>
             </CardHeader>

@@ -13,7 +13,7 @@ function ScoreBadge({ score, opponentScore }: { score: number | undefined, oppon
   const isWinner = (score || 0) > (opponentScore || 0)
   
   return (
-    <span className={`px-3 py-1 rounded w-[40px] text-center font-light text-4xl font-reckless  ${
+    <span className={`px-3 py-1 rounded w-[40px] text-center font-normal text-4xl  ${
       isWinner ? 'text-foreground' : 'text-foreground/50'
     }`}>
       {score ?? '-'}
@@ -40,7 +40,7 @@ function PairRow({
 }) {
   return (
     <div className={`flex justify-between items-center ${className || ''}`}>
-        <div className={`text-md truncate pr-4 text-foreground font-roobert ${isWinner ? 'font-bold' : 'font-normal'}`}>
+        <div className={`text-md truncate pr-4 text-foreground font-semibold ${isWinner ? '' : 'text-foreground/50'}`}>
             {formatName(pair?.player1?.first_name)} {formatName(pair?.player1?.last_name)}
             <br/>
             {formatName(pair?.player2?.first_name)} {formatName(pair?.player2?.last_name)}

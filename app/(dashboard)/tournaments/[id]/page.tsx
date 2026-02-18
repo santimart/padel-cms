@@ -21,6 +21,7 @@ import { MatchesDisplay } from '@/components/tournaments/matches-display'
 import { PlayoffBracket } from '@/components/tournaments/playoff-bracket'
 import { RegistrationsDisplay } from '@/components/tournaments/registrations-display'
 import { TournamentQRDialog } from '@/components/tournament/tournament-qr-dialog'
+import { TournamentDetailItem } from '@/components/tournaments/tournament-detail-item'
 import type { Tournament, Pair, Player } from '@/lib/types'
 
 type TournamentWithComplex = Tournament & {
@@ -142,8 +143,8 @@ export default function TournamentDetailPage() {
     const variants: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline', className: string }> = {
       registration: { label: 'Inscripción Abierta', variant: 'default', className: '' },
       zones: { label: 'Fase de Zonas', variant: 'secondary', className: '' },
-      playoffs: { label: 'Playoffs', variant: 'secondary', className: 'bg-blue-500' },
-      finished: { label: 'Finalizado', variant: 'outline', className: 'bg-primary text-primary-foreground font-bold' },
+      playoffs: { label: 'Playoffs', variant: 'secondary', className: 'bg-chart-3 text-white' },
+      finished: { label: 'Finalizado', variant: 'outline', className: 'bg-chart-3 text-white font-bold' },
     }
     const config = variants[status] || { label: status, variant: 'outline' }
     return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>
@@ -158,8 +159,8 @@ export default function TournamentDetailPage() {
   
   // Define color for the indicator based on percentage
   const getProgressColor = (percent: number) => {
-    if (percent === 100) return 'bg-green-500'
-    if (percent >= 50) return 'bg-yellow-500'
+    if (percent === 100) return 'bg-primary'
+    if (percent >= 50) return 'bg-destructive'
     return 'bg-red-500'
   }
 
@@ -309,7 +310,7 @@ export default function TournamentDetailPage() {
                         className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="h-8 w-8 rounded-full flex items-center justify-center font-semibold text-primary font-reckless text-md border-primary border">
+                          <div className="h-8 w-8 rounded-full flex items-center justify-center text-primary font-medium text-md border-primary border">
                             {index + 1}
                           </div>
                           <div>
@@ -393,12 +394,12 @@ export default function TournamentDetailPage() {
           {hasPlayoffs && (
             <TabsContent value="playoffs">
               <Card>
-                <CardHeader>
+                {/* <CardHeader>
                   <CardTitle>Bracket de Playoffs</CardTitle>
                   <CardDescription>
                     Fase eliminatoria con los mejores equipos de cada zona
                   </CardDescription>
-                </CardHeader>
+                </CardHeader> */}
                 <CardContent>
                   <PlayoffBracket 
                     tournamentId={tournamentId} 
@@ -421,59 +422,41 @@ export default function TournamentDetailPage() {
           <TabsContent value="settings">
             <Card>
               <CardHeader>
-                <CardTitle>Configuración del Torneo</CardTitle>
-                <CardDescription>Ajustes y opciones avanzadas</CardDescription>
+                <CardTitle className='text-lg'>Configuración del Torneo</CardTitle>
+                {/* <CardDescription>Ajustes y opciones avanzadas</CardDescription> */}
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Estado</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {getStatusBadge(tournament.status)}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Máximo de Parejas</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {tournament.max_pairs || 'Sin límite'}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Fecha de Inicio</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {tournament.start_date
-                        ? new Date(tournament.start_date).toLocaleDateString('es-AR')
-                        : 'No definida'}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Fecha de Fin</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {tournament.end_date
-                        ? new Date(tournament.end_date).toLocaleDateString('es-AR')
-                        : 'No definida'}
-                    </p>
-                    <div>
-                    <Label className="text-sm font-medium">Ranking Asignado</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {tournament.ranking_definitions ? (
-                        <Link href={`/rankings/${tournament.ranking_definitions.id}`} className="hover:underline text-primary">
-                          {tournament.ranking_definitions.name}
-                        </Link>
-                      ) : (
-                        'No suma puntos'
-                      )}
-                    </p>
-                  </div>
+                  <TournamentDetailItem label="Estado">
+                    {getStatusBadge(tournament.status)}
+                  </TournamentDetailItem>
+                  <TournamentDetailItem label="Máximo de Parejas">
+                    {tournament.max_pairs || 'Sin límite'}
+                  </TournamentDetailItem>
+                  <TournamentDetailItem label="Fecha de Inicio">
+                    {tournament.start_date
+                      ? new Date(tournament.start_date).toLocaleDateString('es-AR')
+                      : 'No definida'}
+                  </TournamentDetailItem>
+                  <TournamentDetailItem label="Fecha de Fin">
+                    {tournament.end_date
+                      ? new Date(tournament.end_date).toLocaleDateString('es-AR')
+                      : 'No definida'}
+                  </TournamentDetailItem>
+                  <TournamentDetailItem label="Ranking Asignado" border={false}>
+                    {tournament.ranking_definitions ? (
+                      <Link href={`/rankings/${tournament.ranking_definitions.id}`} className="hover:underline text-primary">
+                        {tournament.ranking_definitions.name}
+                      </Link>
+                    ) : (
+                      'No suma puntos'
+                    )}
+                  </TournamentDetailItem>
                   {tournament.ranking_definitions && (
-                    <div>
-                      <Label className="text-sm font-medium">Puntos del Torneo</Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {tournament.total_points || 0} puntos base
-                      </p>
-                    </div>
+                    <TournamentDetailItem label="Puntos del Torneo">
+                    {tournament.total_points || 0} puntos base
+                    </TournamentDetailItem>
                   )}
-                </div>
                 </div>
 
                 {tournament.status !== 'finished' && (
@@ -501,6 +484,4 @@ export default function TournamentDetailPage() {
   )
 }
 
-function Label({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={className}>{children}</div>
-}
+

@@ -57,7 +57,7 @@ export function Autocomplete({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between font-normal"
+          className="w-full justify-between font-normal rounded-lg h-12 border-border bg-background/30 capitalize tracking-normal "
           disabled={disabled || loading}
         >
           {value

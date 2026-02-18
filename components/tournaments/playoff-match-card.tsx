@@ -67,7 +67,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate, isEditable = true }: Pl
                         {formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)} / {formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}
                      </span>
                      {match.pair1.zone?.name && (
-                       <Badge variant="outline" className="w-fit mt-1 text-[10px] h-5 px-1.5">
+                       <Badge variant="outline" className="w-fit mt-1 text-[12px] h-5 px-1.5  bg-transparent border-foreground">
                          Zona {match.pair1.zone.name}
                        </Badge>
                      )}
@@ -80,7 +80,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate, isEditable = true }: Pl
              {isCompleted && (
                <div className="flex items-center gap-1">
                  {Array.from({ length: setsCount }).map((_, i) => (
-                    <span key={i} className={`font-reckless text-foreground text-2xl px-2 py-0.5 rounded text-center min-w-[24px] ${
+                    <span key={i} className={`font-medium text-foreground text-2xl px-2 py-0.5 rounded text-center w-[35px] ${
                       (p1Games[i] > p2Games[i]) ? 'font-bold' : ''
                     }`}>
                       {p1Games[i] ?? '-'}
@@ -99,7 +99,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate, isEditable = true }: Pl
                         {formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)} / {formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}
                      </span>
                      {match.pair2.zone?.name && (
-                       <Badge variant="outline" className="w-fit mt-1 text-[10px] h-5 px-1.5">
+                       <Badge variant="outline" className="w-fit mt-1 text-[12px] h-5 px-1.5  bg-transparent border-foreground">
                          Zona {match.pair2.zone.name}
                        </Badge>
                      )}
@@ -112,7 +112,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate, isEditable = true }: Pl
              {isCompleted && (
                <div className="flex items-center gap-1">
                  {Array.from({ length: setsCount }).map((_, i) => (
-                    <span key={i} className={`font-reckless text-foreground text-2xl px-2 py-0.5 rounded text-center min-w-[24px] ${
+                    <span key={i} className={`font-medium text-foreground text-2xl px-2 py-0.5 rounded text-center min-w-[35px] ${
                       (p2Games[i] > p1Games[i]) ? 'font-bold' : ''
                     }`}>
                       {p2Games[i] ?? '-'}

@@ -105,15 +105,15 @@ export function PlayoffBracket({ tournamentId, isEditable = true }: PlayoffBrack
   return (
     <div>
       {/* Round navigation */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-2 mb-6 overflow-x-auto border-b-2 border-border">
         {availableRounds.map(round => (
           <button
             key={round}
             onClick={() => setSelectedRound(round)}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`px-4 py-2 text-sm  whitespace-nowrap transition-colors uppercase tracking-wider  ${
               selectedRound === round
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted hover:bg-muted/80'
+                ? 'text-primary font-bold border-b-3 border-primary'
+                : 'hover:bg-muted/80'
             }`}
           >
             {ROUND_LABELS[round] || round}

@@ -18,6 +18,16 @@ const roobert = localFont({
       style: "normal",
     },
     {
+      path: "../public/fonts/roobert_medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/roobert_semibold.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
       path: "../public/fonts/roobert_bold.woff2",
       weight: "700",
       style: "normal",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { formatName } from '@/lib/utils'
+import { cn, formatName } from '@/lib/utils'
 import {
   Table,
   TableBody,
@@ -195,8 +195,8 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center flex-col">
-          <span className="text-3xl font-bold">{value}%</span>
-          <span className="text-xs text-muted-foreground">Pagado</span>
+          <span className="text-4xl text-foreground">{value}<span className="text-xl ">%</span></span>
+          {/* <span className="text-md text-foreground ">Pagado</span> */}
         </div>
       </div>
     )
@@ -212,59 +212,59 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
       <div className="grid md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-lg font-bold">
               Progreso de Pagos
             </CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center py-4">
-             <CircularProgress value={percentagePaid} />
+             <CircularProgress value={percentagePaid}  />
           </CardContent>
         </Card>
 
         <Card>
            <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-lg font-bold">
               Resumen Financiero
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
              <div>
-                <div className="text-2xl font-bold text-green-600">
-                  ${totalCollected.toLocaleString()}
+                <div className="text-3xl font-bold text-primary">
+                  $ {totalCollected.toLocaleString()}
                 </div>
-                <p className="text-xs text-muted-foreground">Recaudado</p>
+                <p className="text-md text-muted-foreground">Recaudado</p>
              </div>
              <div>
-                <div className="text-lg font-semibold text-muted-foreground">
-                  ${totalEstimated.toLocaleString()}
+                <div className="text-2xl font-semibold text-muted-foreground">
+                  $ {totalEstimated.toLocaleString()}
                 </div>
-                <p className="text-xs text-muted-foreground">Total Estimado</p>
+                <p className="text-md text-muted-foreground">Total Estimado</p>
              </div>
           </CardContent>
         </Card>
 
          <Card>
            <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-lg font-bold">
               Estado de Jugadores
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-             <div className="flex justify-between items-center">
+             <div className="flex justify-between items-center text-lg">
                <span>Total Jugadores:</span>
                <span className="font-bold">{totalPlayers}</span>
              </div>
-             <div className="flex justify-between items-center">
+             <div className="flex justify-between items-center text-lg">
                <span className="flex items-center gap-2">
-                 <CheckCircle2 className="h-4 w-4 text-green-500" /> Pagaron:
+                 <CheckCircle2 className="h-4 w-4 text-primary" /> Pagaron:
                </span>
-               <span className="font-bold text-green-600">{paidPlayers}</span>
+               <span className="font-bold text-primary">{paidPlayers}</span>
              </div>
-             <div className="flex justify-between items-center">
+             <div className="flex justify-between items-center text-lg">
                <span className="flex items-center gap-2">
-                 <XCircle className="h-4 w-4 text-red-400" /> Pendientes:
+                 <XCircle className="h-4 w-4 text-destructive" /> Pendientes:
                </span>
-               <span className="font-bold text-red-500">{totalPlayers - paidPlayers}</span>
+               <span className="font-bold text-destructive">{totalPlayers - paidPlayers}</span>
              </div>
           </CardContent>
         </Card>
@@ -273,15 +273,15 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
       {/* Players Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Listado de Jugadores</CardTitle>
-          <CardDescription>
+          <CardTitle className='text-lg'>Listado de Jugadores</CardTitle>
+          {/* <CardDescription className='text-md'>
             Gestiona el estado de pago de cada jugador
-          </CardDescription>
+          </CardDescription> */}
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className='uppercase text-xs tracking-wider'>
                 <TableHead>Jugador</TableHead>
                 <TableHead>Pareja</TableHead>
                 <TableHead>Estado</TableHead>
@@ -295,11 +295,11 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
                   <TableCell className="text-muted-foreground">{player.partnerName}</TableCell>
                   <TableCell>
                     {player.isPaid ? (
-                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
+                      <Badge className="bg-primary/10 border-primary text-primary hover:bg-">
                         Pagado
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-red-500 border-red-200 bg-red-50">
+                      <Badge variant="outline" className="text-destructive border-destructive bg-destructive/10">
                         Pendiente
                       </Badge>
                     )}
@@ -307,11 +307,13 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
                   <TableCell className="text-right">
                     <Button
                       variant={player.isPaid ? "outline" : "default"}
-                      size="sm"
+                      size="xs"
                       onClick={() => handleTogglePayment(player)}
-                      className={player.isPaid ? "text-muted-foreground" : "bg-green-600 hover:bg-green-700"}
+                      className={cn('w-[100px]',
+                        player.isPaid ? "text-foreground" : "bg-primary text-white hover:bg-primary/80"
+                      )}
                     >
-                      {player.isPaid ? 'Deshacer' : 'Marcar Pagado'}
+                      {player.isPaid ? 'Deshacer' : 'Pagar'}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -325,8 +327,8 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
       <Dialog open={confirmDialog.isOpen} onOpenChange={(open) => !open && setConfirmDialog({ isOpen: false, player: null })}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar Pago</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className='text-xl'>Confirmar Pago</DialogTitle>
+            <DialogDescription className='text-md'>
               ¿Confirmas que <strong>{confirmDialog.player?.name}</strong> ha pagado la inscripción de <strong>${registrationPrice.toLocaleString()}</strong>?
             </DialogDescription>
           </DialogHeader>
@@ -334,7 +336,7 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
             <Button variant="outline" onClick={() => setConfirmDialog({ isOpen: false, player: null })}>
               Cancelar
             </Button>
-            <Button onClick={confirmPayment} className="bg-green-600 hover:bg-green-700">
+            <Button onClick={confirmPayment} className="bg-primary text-white hover:bg-primary/80">
               Confirmar Pago
             </Button>
           </DialogFooter>

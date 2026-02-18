@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import type { Player } from '@/lib/types'
 import { formatName } from '@/lib/utils'
+import { PageHeader } from '@/components/ui/page-header'
 
 export default function PlayersPage() {
   const [players, setPlayers] = useState<Player[]>([])
@@ -52,12 +53,10 @@ export default function PlayersPage() {
     <div className="">
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Base de Datos de Jugadores</h1>
-          <p className="text-muted-foreground">
-            Base de datos global compartida entre todos los clubes
-          </p>
-        </div>
+        <PageHeader
+          title="Base de Datos de Jugadores"
+          description="Base de datos global compartida entre todos los clubes"
+        />
 
         {/* Actions */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -72,17 +71,11 @@ export default function PlayersPage() {
           <div className="flex gap-2">
             <Button asChild>
               <Link href="/register-player">
-                <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
                 Registrar Jugador
               </Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href="/register-player/qr">
-                <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                </svg>
                 Generar QR
               </Link>
             </Button>

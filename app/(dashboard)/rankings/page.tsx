@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageHeader } from '@/components/ui/page-header'
 import { getComplexRankingDefinitions } from '@/lib/actions/rankings'
 import { createClient } from '@/lib/supabase/server'
 
@@ -66,17 +67,14 @@ export default async function RankingsPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Rankings</h1>
-          <p className="text-muted-foreground mt-2">
-            Gestiona los sistemas de puntuación para tus torneos
-          </p>
-        </div>
+      <PageHeader
+        title="Rankings"
+        description="Gestiona los sistemas de puntuación para tus torneos"
+      >
         <Button asChild>
           <Link href="/rankings/create">Crear Ranking</Link>
         </Button>
-      </div>
+      </PageHeader>
 
       <Suspense fallback={<div>Cargando rankings...</div>}>
         <RankingList complexId={complex.id} />
