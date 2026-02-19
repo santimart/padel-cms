@@ -126,7 +126,7 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName, numZones }: Zone
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Tabla de Posiciones - Zona {zoneName}</CardTitle>
+          <CardTitle className="text-xl font-semibold">Tabla de Posiciones - Zona {zoneName}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-center text-md text-muted-foreground py-4">
@@ -138,10 +138,9 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName, numZones }: Zone
   }
 
   return (
-    <Card className='shadow-none'>
-      <CardHeader>
-        <CardTitle className="text-lg">Tabla de Posiciones - Zona {zoneName}</CardTitle>
-      </CardHeader>
+    <div>
+      <h4 className="text-lg font-semibold mb-3">Tabla de Posiciones - Zona {zoneName}</h4>
+    <Card className='shadow-none bg-transparent border-2'>
       <CardContent className='p-0'>
         <Table>
           <TableHeader>
@@ -161,7 +160,7 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName, numZones }: Zone
               
               return (
                 <TableRow key={standing.pairId} className={qualified ? 'bg-secondary/20' : ''}>
-                  <TableCell className="font-medium ">
+                  <TableCell className="font-medium">
                     <span className='flex items-center gap-2'>
                     {standing.position}
                     {qualified && (
@@ -210,5 +209,6 @@ export function ZoneStandings({ tournamentId, zoneId, zoneName, numZones }: Zone
         </div>
       </CardContent>
     </Card>
+    </div>
   )
 }

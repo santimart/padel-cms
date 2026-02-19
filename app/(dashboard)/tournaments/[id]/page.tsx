@@ -8,7 +8,7 @@ import { formatName } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ExternalLink } from 'lucide-react'
+import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import { GenerateZonesButton } from '@/components/tournaments/generate-zones-button'
@@ -143,8 +143,8 @@ export default function TournamentDetailPage() {
     const variants: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline', className: string }> = {
       registration: { label: 'Inscripción Abierta', variant: 'default', className: '' },
       zones: { label: 'Fase de Zonas', variant: 'secondary', className: '' },
-      playoffs: { label: 'Playoffs', variant: 'secondary', className: 'bg-chart-3 text-white' },
-      finished: { label: 'Finalizado', variant: 'outline', className: 'bg-chart-3 text-white font-bold' },
+      playoffs: { label: 'Playoffs', variant: 'secondary', className: 'bg-chart-3 border-chart-3 text-white font-bold' },
+      finished: { label: 'Finalizado', variant: 'outline', className: 'bg-chart-1 border-chart-1 text-white font-bold' },
     }
     const config = variants[status] || { label: status, variant: 'outline' }
     return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>
@@ -183,9 +183,11 @@ export default function TournamentDetailPage() {
           <CardContent className="pt-6 text-center">
             <h2 className="text-2xl font-bold mb-4">Torneo no encontrado</h2>
             <p className="text-muted-foreground mb-6">{error || 'El torneo que buscas no existe'}</p>
-            <Button asChild>
-              <Link href="/dashboard">Volver al Dashboard</Link>
-            </Button>
+            <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-2 inline-block">
+              <div className='flex items-center text-foreground rounded-full hover:bg-secondary/30 p-2 transition-colors duration-200'>
+                <ChevronLeft className='w-6 h-6 ' />
+              </div>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -196,12 +198,14 @@ export default function TournamentDetailPage() {
     <>
       {/* Tournament Header */}
       <div className="mb-8 border-b border-border py-3 pb-8">
-          <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block">
-            ← Volver al dashboard
-          </Link>
+      <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground mb-2 inline-block">
+        <div className='flex items-center text-foreground rounded-full hover:bg-secondary/30 p-2 transition-colors duration-200'>
+          <ChevronLeft className='w-6 h-6 ' />
+        </div>
+      </Link>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-reckless mb-2">{tournament.name}</h1>
+              <h1 className="text-4xl mb-2">{tournament.name}</h1>
               <div className="flex flex-wrap items-center gap-3 text-foreground uppercase tracking-wider">
                 <span>{tournament.complexes.name}</span>
                 <span>-</span>
@@ -267,19 +271,17 @@ export default function TournamentDetailPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Parejas Inscritas</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-2xl">Parejas Inscritas</CardTitle>
+                    <CardDescription className="text-md">
                       {tournament.status === 'registration'
                         ? 'Inscribe parejas para el torneo'
                         : 'Inscripción cerrada'}
                     </CardDescription>
                   </div>
                   {tournament.status === 'registration' && (
-                    <Button asChild>
+                    <Button asChild variant='default'>
                       <Link href={`/tournaments/${tournamentId}/add-pair`}>
-                        <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
+
                         Inscribir Pareja
                       </Link>
                     </Button>
@@ -314,7 +316,7 @@ export default function TournamentDetailPage() {
                             {index + 1}
                           </div>
                           <div>
-                            <div className="text-lg">
+                            <div className="text-lg font-medium">
                               {formatName(pair.player1.first_name)} {formatName(pair.player1.last_name)} <span className="px-2 opacity-40">/</span> {formatName(pair.player2.first_name)} {formatName(pair.player2.last_name)}
                             </div>
                             <div className="text-sm text-muted-foreground">

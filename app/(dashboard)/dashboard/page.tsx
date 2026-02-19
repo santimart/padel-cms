@@ -65,7 +65,7 @@ export default function DashboardPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-medium">Mis Torneos</h2>
-            <Button asChild variant="outline">
+            <Button asChild variant="default">
               <Link href="/tournaments/create">
                 <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -163,17 +163,17 @@ function TournamentsSection() {
   }
 
   return (
-    <div className="space-y-4  rounded-xl bg-card p-4">
+    <div className="flex flex-col gap-3">
       {tournaments.map((tournament: any) => (
         <Link key={tournament.id} href={`/tournaments/${tournament.id}`}>
-          <Card className="hover:bg-secondary/20 transition-colors cursor-pointer border-3 border-border">
+          <Card className="hover:border-foreground border-border border-2 transition-colors cursor-pointer shadow-none">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className='text-xl'>{tournament.name}</CardTitle>
                   <CardDescription className='text-md'>{tournament.complexes.name}</CardDescription>
                 </div>
-                <Badge variant={tournament.status === 'registration' ? 'default' : 'secondary'}>
+                <Badge variant={tournament.status === 'registration' ? 'outline' : 'secondary'}>
                   {tournament.status === 'registration' ? 'Inscripción' : tournament.status}
                 </Badge>
               </div>

@@ -295,11 +295,11 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
                   <TableCell className="text-muted-foreground">{player.partnerName}</TableCell>
                   <TableCell>
                     {player.isPaid ? (
-                      <Badge className="bg-primary/10 border-primary text-primary hover:bg-">
+                      <Badge className="bg-transparent font-semibold border-none text-primary">
                         Pagado
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-destructive border-destructive bg-destructive/10">
+                      <Badge className="bg-transparent font-semibold border-none text-destructive">
                         Pendiente
                       </Badge>
                     )}
@@ -328,7 +328,7 @@ export function RegistrationsDisplay({ tournamentId, registrationPrice }: Regist
         <DialogContent>
           <DialogHeader>
             <DialogTitle className='text-xl'>Confirmar Pago</DialogTitle>
-            <DialogDescription className='text-md'>
+            <DialogDescription className='text-lg text-foreground/70'>
               ¿Confirmas que <strong>{confirmDialog.player?.name}</strong> ha pagado la inscripción de <strong>${registrationPrice.toLocaleString()}</strong>?
             </DialogDescription>
           </DialogHeader>

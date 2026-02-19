@@ -110,7 +110,7 @@ export function PlayoffBracket({ tournamentId, isEditable = true }: PlayoffBrack
           <button
             key={round}
             onClick={() => setSelectedRound(round)}
-            className={`px-4 py-2 text-sm  whitespace-nowrap transition-colors uppercase tracking-wider  ${
+            className={`px-4 py-2 text-sm  whitespace-nowrap transition-colors uppercase tracking-wider font-semibold  ${
               selectedRound === round
                 ? 'text-primary font-bold border-b-3 border-primary'
                 : 'hover:bg-muted/80'

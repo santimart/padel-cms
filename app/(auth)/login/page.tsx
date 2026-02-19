@@ -40,8 +40,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-lg space-y-6">
         {/* Logo */}
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-2">
@@ -50,16 +50,14 @@ export default function LoginPage() {
             </div>
             <span className="text-2xl font-bold">Padel Manager</span>
           </Link>
-          <p className="text-muted-foreground mt-2">
-            Inicia sesión en tu cuenta
-          </p>
+ 
         </div>
 
         {/* Login Form */}
-        <Card>
+        <Card className='border-white border-3 rounded-xl overflow-hidden shadow-sm bg-card/50 py-8'>
           <CardHeader>
-            <CardTitle>Iniciar Sesión</CardTitle>
-            <CardDescription>
+            <CardTitle className='text-2xl text-center font-medium'>Iniciar Sesión</CardTitle>
+            <CardDescription className='text-lg text-center'>
               Ingresa tus credenciales para acceder al panel de administración
             </CardDescription>
           </CardHeader>
@@ -71,8 +69,8 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+              <div className="space-y-2 mb-4">
+                <Label htmlFor="email text-lg">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -85,7 +83,7 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
+                <Label htmlFor="password text-lg">Contraseña</Label>
                 <Input
                   id="password"
                   type="password"

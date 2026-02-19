@@ -189,7 +189,7 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate, isEditable = true 
                     {/* Scheduled time */}
                     {match.scheduled_time && (
                       <div className="flex items-center gap-6 mb-2">
-                        <div className="text-sm text-primary uppercase font-bold">
+                        <div className="text-sm text-primary uppercase font-medium">
                           <span className='flex items-center gap-2 tracking-wide'>
                           <CalendarIcon className='w-4 h-4' /> {formatMatchTime(match.scheduled_time)}
                           {match.court_number && ` • Cancha ${match.court_number}`}
@@ -206,12 +206,17 @@ export function MatchesDisplay({ tournamentId, onMatchUpdate, isEditable = true 
                     )}
                     
                     <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <div className="font-medium text-lg">
-                          {formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)} / {formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}
+                      <div className="flex-1 flex-col">
+                        <div className="font-medium text-lg flex gap-2">
+                          <span>{formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)}</span>
+                          <span>/</span>
+                          <span>{formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}</span>
                         </div>
-                        <div className="font-medium text-lg mt-1">
-                          {formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)} / {formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}
+                        <span className='text-xs text-foreground/50 tracking-wider'>VS.</span>
+                        <div className="font-medium text-lg flex gap-2">
+                          <span>{formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)}</span>
+                          <span>/</span>  
+                          <span>{formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}</span>
                         </div>
                       </div>
                       <div className="text-center min-w-[60px]">

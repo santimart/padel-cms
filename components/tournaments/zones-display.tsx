@@ -109,7 +109,7 @@ export function ZonesDisplay({ tournamentId }: ZonesDisplayProps) {
           <Card key={zone.id}>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Zona {zone.name}</CardTitle>
+                <CardTitle className='text-2xl text-primary'>Zona <span className='font-bold'>{zone.name}</span></CardTitle>
                 <Badge variant="secondary">{zonePairs.length} parejas</Badge>
               </div>
               <CardDescription>

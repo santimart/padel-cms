@@ -40,7 +40,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate, isEditable = true }: Pl
           {/* Scheduled time */}
           <div className="flex items-center gap-2 mb-3 text-xs">
             {match.scheduled_time ? (
-               <div className="text-sm text-primary uppercase font-bold">
+               <div className="text-sm text-primary uppercase font-medium">
                 <span className='flex items-center gap-2 tracking-wide'>
                   <CalendarIcon className='w-4 h-4' /> {formatMatchTime(match.scheduled_time)}
                   {match.court_number && ` • Cancha ${match.court_number}`}
@@ -63,7 +63,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate, isEditable = true }: Pl
              <div className="flex-1">
                 {match.pair1 ? (
                    <div className="flex flex-col">
-                     <span className="text-lg">
+                     <span className="text-lg font-medium">
                         {formatName(match.pair1.player1.first_name)} {formatName(match.pair1.player1.last_name)} / {formatName(match.pair1.player2.first_name)} {formatName(match.pair1.player2.last_name)}
                      </span>
                      {match.pair1.zone?.name && (
@@ -95,7 +95,7 @@ export function PlayoffMatchCard({ match, onMatchUpdate, isEditable = true }: Pl
              <div className="flex-1">
                  {match.pair2 ? (
                    <div className="flex flex-col">
-                     <span className="text-lg">
+                     <span className="text-lg font-medium">
                         {formatName(match.pair2.player1.first_name)} {formatName(match.pair2.player1.last_name)} / {formatName(match.pair2.player2.first_name)} {formatName(match.pair2.player2.last_name)}
                      </span>
                      {match.pair2.zone?.name && (

@@ -31,8 +31,8 @@ export function ProfileMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 border border-border bg-muted/50 hover:bg-muted">
-          <User className="h-5 w-5 text-muted-foreground" />
+        <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 border border-border bg-card hover:bg-muted">
+          <User className="h-12 w-12"  size={14}/>
           <span className="sr-only">Abrir menú de usuario</span>
         </Button>
       </DropdownMenuTrigger>
@@ -40,7 +40,7 @@ export function ProfileMenu() {
         <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild disabled>
            <Link href="/profile" className="cursor-pointer w-full flex items-center">
             <User className="mr-2 h-4 w-4" />
             <span>Perfil</span>

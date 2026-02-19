@@ -53,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${inter.variable} ${roobert.variable} ${reckless.variable} font-roobert antialiased min-h-screen dark:bg-background`}>
+      <body className={`${inter.variable} ${roobert.variable} ${reckless.variable} font-roobert antialiased min-h-screen bg-linear-to-t from-10% to-90% from-background to-primary/10 dark:bg-background`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

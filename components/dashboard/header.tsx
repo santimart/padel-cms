@@ -12,7 +12,7 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) {
 
   return (
-    <header className="sticky top-0 z-50 mb-10">
+    <header className="sticky top-0 z-50 mb-10 bg-white/40">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           {logoUrl ? (
