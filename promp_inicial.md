@@ -1,4 +1,4 @@
-## Puntos Clave del Sistema: Padel Manager Web
+## Puntos Clave del Sistema: ReRank Web
 
 Crear una web app que permite generar torneos de padel amateur, por categoria, los jugadores pueden cargar su propio perfil de usuario escaneando un qr, se genera una base de datos general, cada club puede tener acceso al sistema.
 

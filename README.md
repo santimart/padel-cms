@@ -1,4 +1,4 @@
-# Padel Manager - Sistema de Gestión de Torneos de Pádel
+# ReRank - Sistema de Gestión de Torneos de Pádel
 
 Sistema profesional para gestionar torneos de pádel amateur con ranking automático, generación de cuadros, y seguimiento en tiempo real.
 

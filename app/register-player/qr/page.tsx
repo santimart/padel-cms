@@ -54,7 +54,7 @@ export default function QRGeneratorPage() {
               <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-2xl font-bold text-primary-foreground">P</span>
               </div>
-              <span className="text-xl font-bold">Padel Manager</span>
+              <span className="text-xl font-bold">ReRank</span>
             </Link>
           </div>
           <nav className="flex items-center gap-4">

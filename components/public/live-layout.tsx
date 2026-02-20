@@ -110,7 +110,7 @@ export function LiveLayout({ tournament, children }: LiveLayoutProps) {
       {/* Footer / Ticker */}
       {!isFullscreen && (
         <footer className="bg-card border-t border-border/40 py-3 px-6 text-center text-sm text-muted-foreground">
-          <p>Actualizaciones en tiempo real • Padel Manager Live</p>
+          <p>Actualizaciones en tiempo real • ReRank Live</p>
         </footer>
       )}
     </div>

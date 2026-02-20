@@ -24,7 +24,7 @@ export default async function HomePage() {
             <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-2xl font-bold text-primary-foreground">P</span>
             </div>
-            <span className="text-xl font-bold">Padel Manager</span>
+            <span className="text-xl font-bold">ReRank</span>
           </div>
           <nav className="flex items-center gap-4">
             <Link href="/login">
@@ -162,7 +162,7 @@ export default async function HomePage() {
           <CardHeader className="space-y-4">
             <CardTitle className="text-3xl">¿Listo para Empezar?</CardTitle>
             <CardDescription className="text-lg">
-              Únete a los clubes que ya están usando Padel Manager para organizar sus torneos
+              Únete a los clubes que ya están usando ReRank para organizar sus torneos
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -178,7 +178,7 @@ export default async function HomePage() {
       {/* Footer */}
       <footer className="border-t border-border/40 mt-20">
         <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 Padel Manager. Sistema profesional de gestión de torneos de pádel.</p>
+          <p>&copy; 2025 ReRank. Sistema profesional de gestión de torneos de pádel.</p>
         </div>
       </footer>
     </div>

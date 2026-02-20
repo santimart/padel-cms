@@ -31,7 +31,7 @@ export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) 
             </div>
           )}
           <span className="text-xl font-bold truncate max-w-[200px] sm:max-w-none">
-            {complexName || 'Padel Manager'}
+            {complexName || 'ReRank'}
           </span>
         </Link>
         

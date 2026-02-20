@@ -306,7 +306,7 @@ export default function PublicRegisterPlayerPage() {
         
         <div className="mt-8 text-center">
           <p className="text-xs text-muted-foreground">
-            Padel Manager © {new Date().getFullYear()}
+            ReRank © {new Date().getFullYear()}
           </p>
         </div>
       </div>

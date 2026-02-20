@@ -97,7 +97,7 @@ export function RankingQRDialog({ rankingId, rankingName }: RankingQRDialogProps
       // Footer
       ctx.fillStyle = '#ffffff'
       ctx.font = 'normal 24px "Inter", sans-serif'
-      ctx.fillText('Powered by Padel Manager', width / 2, height - 25)
+      ctx.fillText('Powered by ReRank', width / 2, height - 25)
 
       const pngFile = canvas.toDataURL('image/png')
       const downloadLink = document.createElement('a')

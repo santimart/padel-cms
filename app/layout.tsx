@@ -42,7 +42,7 @@ const reckless = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Padel Manager - Sistema de Gestión de Torneos",
+  title: "ReRank - Sistema de Gestión de Torneos",
   description: "Plataforma profesional para gestionar torneos de pádel amateur con ranking automático y seguimiento en tiempo real",
 };
 
@@ -56,7 +56,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${roobert.variable} ${reckless.variable} font-roobert antialiased min-h-screen bg-linear-to-t from-10% to-90% from-background to-primary/10 dark:bg-background`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

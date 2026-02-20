@@ -151,7 +151,7 @@ export default function RegisterPage() {
             <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-2xl font-bold text-primary-foreground">P</span>
             </div>
-            <span className="text-2xl font-bold">Padel Manager</span>
+            <span className="text-2xl font-bold">ReRank</span>
           </Link>
           <p className="text-muted-foreground mt-2">
             Crea tu cuenta y comienza a gestionar torneos

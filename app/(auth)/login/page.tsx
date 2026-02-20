@@ -48,7 +48,7 @@ export default function LoginPage() {
             <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-2xl font-bold text-primary-foreground">P</span>
             </div>
-            <span className="text-2xl font-bold">Padel Manager</span>
+            <span className="text-2xl font-bold">ReRank</span>
           </Link>
  
         </div>

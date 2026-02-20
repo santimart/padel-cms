@@ -171,7 +171,7 @@ export function PublicRankingView({ ranking, leaderboard }: PublicRankingViewPro
       {/* Footer */}
       <footer className="border-t mt-12 py-4 text-center">
         <p className="text-xs text-muted-foreground">
-          Padel Manager © {new Date().getFullYear()}
+          ReRank © {new Date().getFullYear()}
         </p>
       </footer>
     </div>
