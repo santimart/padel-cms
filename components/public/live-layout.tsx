@@ -65,7 +65,7 @@ export function LiveLayout({ tournament, children }: LiveLayoutProps) {
               />
             ) : (
                 <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                  <span className="text-3xl font-bold text-primary-foreground">
+                  <span className="text-3xl font-bold text-white">
                     {tournament.complexes?.name ? tournament.complexes.name.charAt(0).toUpperCase() : 'P'}
                   </span>
                 </div>

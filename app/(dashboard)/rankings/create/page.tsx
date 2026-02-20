@@ -117,7 +117,7 @@ function RankingForm() {
     }
 
     return (
-        <form onSubmit={onSubmit} className="space-y-8">
+        <form onSubmit={onSubmit} className="space-y-8 card-glass p-4">
              <div className="space-y-4">
                 <div className="grid gap-2">
                     <Label htmlFor="name">Nombre del Ranking</Label>
@@ -226,7 +226,7 @@ function RankingForm() {
              </div>
 
              <div className="flex justify-end gap-4">
-                <Button type="button" variant="ghost" onClick={() => router.back()}>Cancelar</Button>
+                <Button type="button" variant="outline" onClick={() => router.back()} >Cancelar</Button>
                 <Button type="submit" disabled={loading}>
                     {loading ? 'Creando...' : 'Crear Ranking'}
                 </Button>

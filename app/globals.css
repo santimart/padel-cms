@@ -149,3 +149,11 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.card-glass {
+  @apply border-white border-3 rounded-xl overflow-hidden shadow-sm bg-card/50 py-8;
+}
+
+.bg-gradient {
+  @apply bg-linear-to-t from-10% to-90% from-background to-primary/10 dark:bg-background;
+}

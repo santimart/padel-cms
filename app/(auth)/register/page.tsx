@@ -143,14 +143,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+    <div className="min-h-screen flex items-center justify-center py-12">
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-2">
-            <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-foreground">P</span>
-            </div>
             <span className="text-2xl font-bold">ReRank</span>
           </Link>
           <p className="text-muted-foreground mt-2">
@@ -159,7 +156,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Register Form */}
-        <Card>
+        <Card className='card-glass'>
           <CardHeader>
             <CardTitle>Crear Cuenta</CardTitle>
             <CardDescription>
@@ -235,7 +232,7 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <div className="border-t pt-4 space-y-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -299,7 +296,7 @@ export default function RegisterPage() {
         {/* Back to home */}
         <div className="text-center">
           <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Volver al inicio
+            ← Volver al logon
           </Link>
         </div>
       </div>

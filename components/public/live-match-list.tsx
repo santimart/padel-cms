@@ -40,7 +40,7 @@ function PairRow({
 }) {
   return (
     <div className={`flex justify-between items-center ${className || ''}`}>
-        <div className={`text-md truncate pr-4 text-foreground font-semibold ${isWinner ? '' : 'text-foreground/50'}`}>
+        <div className={`text-md truncate pr-4 font-medium ${isWinner ? 'font-semibold' : ''}`}>
             {formatName(pair?.player1?.first_name)} {formatName(pair?.player1?.last_name)}
             <br/>
             {formatName(pair?.player2?.first_name)} {formatName(pair?.player2?.last_name)}
@@ -119,7 +119,7 @@ function CarouselSection({ title, matches, icon, emptyMessage, status }: Carouse
   if (matches.length === 0) {
     return (
       <div className="space-y-4">
-        <h2 className="text-4xl flex items-center text-foreground capitalize font-reckless">
+        <h2 className="text-3xl flex items-center text-foreground">
           {icon} {title}
         </h2>
         <p className="text-muted-foreground text-lg">{emptyMessage}</p>
@@ -129,7 +129,7 @@ function CarouselSection({ title, matches, icon, emptyMessage, status }: Carouse
 
   return (
     <div className="space-y-4">
-      <h2 className="text-4xl  flex items-center text-foreground capitalize font-reckless">
+      <h2 className="text-3xl flex items-center text-foreground">
         {icon} {title}
       </h2>
       
@@ -163,7 +163,7 @@ export function LiveMatchList({ matches }: LiveMatchListProps) {
       <CarouselSection 
         title="En Juego" 
         matches={inProgress} 
-        icon={<span className="animate-pulse mr-2 text-red-500 text-3xl">●</span>}
+        icon={<span className="animate-pulse mr-2 text-red-500 text-xl">●</span>}
         emptyMessage="No hay partidos en juego en este momento."
         status="playing"
       />
@@ -210,7 +210,7 @@ function LiveMatchCard({ match, status }: { match: MatchDetailed, status: 'playi
 
   return (
     <Card className={`bg-white/80 border border-white overflow-hidden p-0 rounded-4xl ${isPlaying ? 'border-primary border-2 ' : ''}`}>
-      <CardContent className="p-6">
+      <CardContent className="p-6 flex flex-col gap-3">
         <div className="flex justify-between items-center mb-6">
            <div className="flex flex-col gap-1 w-full">
              <div className="flex gap-3 items-center justify-start">
@@ -251,7 +251,8 @@ function LiveMatchCard({ match, status }: { match: MatchDetailed, status: 'playi
         />
 
         {/* Separator center line*/}
-        <div className="w-full h-px bg-border/50 my-4" />
+        {/* <div className="w-full h-px bg-border/50 my-4" /> */}
+        <span className='text-xs text-primary font-medium'>VS.</span>
         
 
         {/* Pair 2 */}

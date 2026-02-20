@@ -62,9 +62,9 @@ export function LiveBoard({ tournamentId }: LiveBoardProps) {
   hover:text-primary transition-all`
 
   return (
-    <div className="h-full flex flex-col pb-12">
+    <div className="h-full flex flex-col">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-        <div className="flex justify-center mb-6 h-[70px]">
+        <div className="flex justify-center mb-2">
           <TabsList className="grid w-[350px] grid-cols-3 pb-10 bg-transparent overflow-visible gap-4">
             <TabsTrigger value="matches" className={tabStyles}>Partidos</TabsTrigger>
             <TabsTrigger value="standings" className={tabStyles}>Zonas</TabsTrigger>
