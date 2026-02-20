@@ -34,3 +34,30 @@ export async function finishTournament(tournamentId: string) {
   revalidatePath('/rankings')
 }
 
+export async function deleteTournament(tournamentId: string) {
+  const supabase: any = await createClient()
+
+  // 1. Check tournament status
+  const { data: tournament, error: fetchError } = await supabase
+    .from('tournaments')
+    .select('status')
+    .eq('id', tournamentId)
+    .single()
+
+  if (fetchError) throw new Error('No se pudo encontrar el torneo')
+
+  if (tournament.status !== 'registration') {
+    throw new Error('Solo se pueden eliminar torneos que están en fase de inscripción')
+  }
+
+  // 2. Delete the tournament (assuming cascade delete on pairs, matches, etc. or we just delete it if the DB allows it)
+  // If the DB doesn't cascade, we might need to delete pairs first.
+  const { error: deleteError } = await supabase
+    .from('tournaments')
+    .delete()
+    .eq('id', tournamentId)
+
+  if (deleteError) throw new Error(deleteError.message)
+
+  revalidatePath('/dashboard')
+}

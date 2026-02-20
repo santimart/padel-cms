@@ -14,7 +14,7 @@ import { getCategoryName } from '@/lib/tournament/ranking-calculator'
 import { GenerateZonesButton } from '@/components/tournaments/generate-zones-button'
 import { GeneratePlayoffsButton } from '@/components/tournaments/generate-playoffs-button'
 import { FinishTournamentButton } from '@/components/tournaments/finish-tournament-button'
-
+import { DeleteTournamentButton } from '@/components/tournaments/delete-tournament-button'
 import { DeletePairButton } from '@/components/tournaments/delete-pair-button'
 import { ZonesDisplay } from '@/components/tournaments/zones-display'
 import { MatchesDisplay } from '@/components/tournaments/matches-display'
@@ -468,11 +468,16 @@ export default function TournamentDetailPage() {
                     Estas acciones son irreversibles y afectarán el estado del torneo y rankings.
                   </p>
                   <div className="flex justify-start gap-4">
-                    <FinishTournamentButton 
-                      tournamentId={tournament.id} 
-                      hasRanking={!!tournament.ranking_definition_id}
-                      allMatchesCompleted={allPlayoffMatchesCompleted}
-                    />
+                    {tournament.status === 'registration' && (
+                      <DeleteTournamentButton tournamentId={tournament.id} />
+                    )}
+                    {tournament.status !== 'registration' && (
+                      <FinishTournamentButton 
+                        tournamentId={tournament.id} 
+                        hasRanking={!!tournament.ranking_definition_id}
+                        allMatchesCompleted={allPlayoffMatchesCompleted}
+                      />
+                    )}
                   </div>
                 </div>
                 )}
