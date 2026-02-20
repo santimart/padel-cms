@@ -45,9 +45,6 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-2">
-            <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-foreground">P</span>
-            </div>
             <span className="text-2xl font-bold">ReRank</span>
           </Link>
  
