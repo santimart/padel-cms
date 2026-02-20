@@ -51,7 +51,7 @@ export default function LoginPage() {
         </div>
 
         {/* Login Form */}
-        <Card className='border-white border-3 rounded-xl overflow-hidden shadow-sm bg-card/50 py-8'>
+        <Card className='card-glass'>
           <CardHeader>
             <CardTitle className='text-2xl text-center font-medium'>Iniciar Sesión</CardTitle>
             <CardDescription className='text-lg text-center'>
@@ -97,21 +97,21 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="mt-4 text-center text-sm">
+            {/* <div className="mt-4 text-center text-sm">
               <span className="text-muted-foreground">¿No tienes cuenta? </span>
               <Link href="/register" className="text-primary hover:underline">
                 Regístrate aquí
               </Link>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
 
         {/* Back to home */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← Volver al inicio
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   )
