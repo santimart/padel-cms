@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { calculateZoneStandings, formatStandingsRecord } from '@/lib/tournament/standings-calculator'
 import { formatName } from '@/lib/utils'
 import { MatchDetailed, PairDetailed } from '@/lib/types'
+import { TableIcon } from 'lucide-react'
 
 interface LiveStandingsProps {
   pairs: PairDetailed[]
@@ -15,7 +16,16 @@ export function LiveStandings({ pairs, matches }: LiveStandingsProps) {
   // Group pairs by zone
   const zoneIds = Array.from(new Set(pairs.map(p => p.zone_id).filter(Boolean))) as string[]
   
-  // Calculate standings for each zone
+  if (zoneIds.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 h-full min-h-[400px]">
+        <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mb-4">
+          <TableIcon className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h3 className="text-2xl font-bold text-foreground/80 text-center mb-2">Las zonas aún no están definidas</h3>
+      </div>
+    )
+  }
   const zonesData = zoneIds.map(zoneId => {
     const zoneName = pairs.find(p => p.zone_id === zoneId)?.zone?.name || 'Zona'
     const zonePairs = pairs.filter(p => p.zone_id === zoneId)

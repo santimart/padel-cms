@@ -47,25 +47,25 @@ export function LiveBoard({ tournamentId }: LiveBoardProps) {
   // Actually, we can just display the clock here or let the parent handle it. The parent has a placeholder.
   // For now, let's focus on the content.
   // For now, let's focus on the content.
-  const tabStyles = `text-lg rounded-full py-1 px-0
+  const tabStyles = `text-lg py-2 px-6
   cursor-pointer
-  uppercase
-  rounded-none
-  tracking-wider
-  border-none
   
-  text-foreground
+  
+  border-b-2
+  border-transparent
+  font-medium
+  
   data-[state=active]:border-primary
   data-[state=active]:text-primary
-  data-[state=active]:border-b-2
-    data-[state=active]:border-none
+  data-[state=active]:bg-transparent
+  data-[state=active]:shadow-none
   hover:text-primary transition-all`
 
   return (
     <div className="h-full flex flex-col">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-        <div className="flex justify-center mb-2">
-          <TabsList className="grid w-[350px] grid-cols-3 pb-10 bg-transparent overflow-visible gap-4">
+        <div className="flex justify-center mb-6 border-b border-border rounded-none h-auto pb-4">
+          <TabsList className="flex w-full max-w-[500px] justify-center gap-2 bg-transparent border-b border-border/40 pb-0 rounded-none h-auto">
             <TabsTrigger value="matches" className={tabStyles}>Partidos</TabsTrigger>
             <TabsTrigger value="standings" className={tabStyles}>Zonas</TabsTrigger>
             <TabsTrigger value="bracket" className={tabStyles}>Cuadro</TabsTrigger>

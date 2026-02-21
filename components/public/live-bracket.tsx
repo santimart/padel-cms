@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { formatName } from "@/lib/utils"
 import { MatchDetailed } from "@/lib/types"
+import { CirclePileIcon } from "lucide-react"
 
 interface LiveBracketProps {
   matches: MatchDetailed[]
@@ -55,9 +56,12 @@ export function LiveBracket({ matches }: LiveBracketProps) {
       })}
       
       {sortedRounds.length === 0 && (
-          <div className="w-full flex items-center justify-center text-muted-foreground text-xl">
-              El cuadro de playoffs aún no se ha generado.
-          </div>
+                <div className="flex flex-col items-center justify-center p-8 h-full min-h-[400px]">
+        <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mb-4">
+          <CirclePileIcon className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h3 className="text-2xl font-bold text-foreground/80 text-center mb-2">El cuadro de playoffs aún no se ha generado.</h3>
+      </div>
       )}
     </div>
   )
