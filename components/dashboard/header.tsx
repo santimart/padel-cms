@@ -14,7 +14,7 @@ export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) 
   const { scrollDirection, isTop } = useScrollDirection();
 
   return (
-    <header className={`sticky top-0 z-50 mb-10 bg-white/40 transition-transform duration-300 ease-in-out ${
+    <header className={`sticky top-0 z-50 mb-10 backdrop-blur-sm bg-white/40 transition-transform duration-300 ease-in-out ${
       scrollDirection === 'down' && !isTop ? '-translate-y-full' : 'translate-y-0'
     }`}>
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">

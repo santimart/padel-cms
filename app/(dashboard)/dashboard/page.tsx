@@ -179,7 +179,7 @@ function TournamentsSection() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-6 text-sm font-medium text-foreground/40 uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground/40 uppercase tracking-wider">
                 <span>{tournament.pairs.length} parejas</span>
                 <span>-</span>
                 <span>Categoría {tournament.category}</span>

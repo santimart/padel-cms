@@ -203,10 +203,10 @@ export default function TournamentDetailPage() {
           <ChevronLeft className='w-6 h-6 ' />
         </div>
       </Link>
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
             <div>
               <h1 className="text-4xl mb-2">{tournament.name}</h1>
-              <div className="flex flex-wrap items-center gap-3 text-foreground uppercase tracking-wider">
+              <div className="flex flex-wrap items-center gap-2 md:gap-3 text-foreground uppercase tracking-wider text-xs md:text-md">
                 <span>{tournament.complexes.name}</span>
                 <span>-</span>
                 <span>{tournament.category ? getCategoryName(tournament.category) : 'Sin categoría'}</span>
@@ -237,33 +237,39 @@ export default function TournamentDetailPage() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className='gap-2 bg-transparent'>
-            <TabsTrigger value="pairs">
-              Parejas ({pairs.length}{tournament.max_pairs ? `/${tournament.max_pairs}` : ''})
-            </TabsTrigger>
-            <TabsTrigger value="zones" disabled={tournament.status === 'registration'}>
-              Zonas
-            </TabsTrigger>
-            <TabsTrigger value="matches" disabled={tournament.status === 'registration'}>
-              Partidos
-            </TabsTrigger>
-            {hasPlayoffs && (
-              <TabsTrigger value="playoffs">
-                Playoffs
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="registrations" className="flex items-center gap-2">
-              Inscripciones
-              <div 
-                className={`h-2 w-2 rounded-full ${getProgressColor(participationPercentage)}`} 
-                title={`${participationPercentage}% pagado`}
-              />
-            </TabsTrigger>
-            <TabsTrigger value="settings">
-              Configuración
-            </TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 w-full">
+          <div className="relative w-full">
+            <div className="w-full overflow-x-auto pb-2 scrollbar-hide snap-x py-4">
+              <TabsList className='flex w-max gap-2 bg-transparent justify-start pr-8'>
+                <TabsTrigger value="pairs" className="snap-start">
+                  Parejas ({pairs.length}{tournament.max_pairs ? `/${tournament.max_pairs}` : ''})
+                </TabsTrigger>
+                <TabsTrigger value="zones" disabled={tournament.status === 'registration'} className="snap-start">
+                  Zonas
+                </TabsTrigger>
+                <TabsTrigger value="matches" disabled={tournament.status === 'registration'} className="snap-start">
+                  Partidos
+                </TabsTrigger>
+                {hasPlayoffs && (
+                  <TabsTrigger value="playoffs" className="snap-start">
+                    Playoffs
+                  </TabsTrigger>
+                )}
+                <TabsTrigger value="registrations" className="flex items-center gap-2 snap-start">
+                  Inscripciones
+                  <div 
+                    className={`h-2 w-2 rounded-full ${getProgressColor(participationPercentage)}`} 
+                    title={`${participationPercentage}% pagado`}
+                  />
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="snap-start">
+                  Configuración
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            {/* Gradient Fade for scroll indication */}
+            <div className="absolute top-0 right-0 bottom-2 w-12 bg-linear-to-l from-background to-transparent pointer-events-none" />
+          </div>
 
           {/* Pairs Tab */}
           <TabsContent value="pairs" className="space-y-4">
