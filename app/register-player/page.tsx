@@ -15,6 +15,7 @@ import { useGeoRef, type Province, type Locality } from '@/hooks/use-georef'
 import { Autocomplete } from '@/components/ui/autocomplete'
 import { ModeToggle } from '@/components/mode-toggle'
 import { PageHeader } from '@/components/ui/page-header'
+import { DashboardHeader } from '@/components/dashboard/header'
 
 export default function RegisterPlayerPage() {
   const router = useRouter()
@@ -147,27 +148,7 @@ export default function RegisterPlayerPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-border/40 bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="text-xl font-bold">ReRank</span>
-            </Link>
-          </div>
-          <nav className="flex items-center gap-4">
-            <ModeToggle />
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link href="/players">Jugadores</Link>
-            </Button>
-          </nav>
-        </div>
-      </header>
+    <DashboardHeader />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
