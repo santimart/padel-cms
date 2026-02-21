@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CATEGORIES } from '@/lib/types'
 import { getCategoryName } from '@/lib/tournament/ranking-calculator'
+import { useGeoRef, type Province, type Locality } from '@/hooks/use-georef'
+import { Autocomplete } from '@/components/ui/autocomplete'
 
 // Kiosk Mode: No navigation, no links to dashboard
 export default function PublicRegisterPlayerPage() {
@@ -20,12 +22,19 @@ export default function PublicRegisterPlayerPage() {
     phone: '',
     category: '',
     gender: '',
+    province: '',
+    city: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [captcha, setCaptcha] = useState<{ a: number; b: number; answer: string }>({ a: 0, b: 0, answer: '' })
   const [captchaInput, setCaptchaInput] = useState('')
+
+  // GeoRef Hook
+  const { provinces, loadingProvinces, getLocalities } = useGeoRef()
+  const [localities, setLocalities] = useState<Locality[]>([])
+  const [loadingLocalities, setLoadingLocalities] = useState(false)
 
   // Generate simple math captcha on load
   const generateCaptcha = () => {
@@ -35,13 +44,42 @@ export default function PublicRegisterPlayerPage() {
     setCaptchaInput('')
   }
   
-  // UseEffect to easier handling on client only
+  // UseEffect to easier handling on client only and prevent hydration mismatch
   const [mounted, setMounted] = useState(false)
-  if (!mounted) {
-      if (typeof window !== 'undefined') {
-          setMounted(true)
-          generateCaptcha()
+  
+  useEffect(() => {
+    setMounted(true)
+    generateCaptcha()
+  }, [])
+
+  const handleProvinceChange = async (provinceId: string) => {
+    // Find province name
+    const province = provinces.find(p => p.id === provinceId)
+    
+    setFormData(prev => ({ 
+      ...prev, 
+      province: province?.nombre || '',
+      city: '' // Reset city when province changes
+    }))
+    
+    if (provinceId) {
+      setLoadingLocalities(true)
+      try {
+        const locs = await getLocalities(provinceId)
+        setLocalities(locs)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoadingLocalities(false)
       }
+    } else {
+      setLocalities([])
+    }
+  }
+
+  const handleCityChange = (cityId: string) => {
+    const city = localities.find(l => l.id === cityId)
+    setFormData(prev => ({ ...prev, city: city?.nombre || '' }))
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +128,8 @@ export default function PublicRegisterPlayerPage() {
         phone: formData.phone || null,
         gender: formData.gender || null,
         current_category: formData.category ? parseInt(formData.category) : null,
+        province: formData.province || null,
+        city: formData.city || null,
       })
 
       if (insertError) throw insertError
@@ -105,6 +145,8 @@ export default function PublicRegisterPlayerPage() {
         phone: '',
         category: '',
         gender: '',
+        province: '',
+        city: '',
       })
       generateCaptcha()
 
@@ -250,6 +292,33 @@ export default function PublicRegisterPlayerPage() {
                 </Select>
               </div>
 
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="province">Provincia</Label>
+                  <Autocomplete
+                    options={provinces.map(p => ({ id: p.id, label: p.nombre }))}
+                    value={provinces.find(p => p.nombre === formData.province)?.id || ''}
+                    onChange={handleProvinceChange}
+                    placeholder="Selecciona provincia"
+                    loading={loadingProvinces}
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="city">Localidad</Label>
+                  <Autocomplete
+                    options={localities.map(l => ({ id: l.id, label: l.nombre }))}
+                    value={localities.find(l => l.nombre === formData.city)?.id || ''}
+                    onChange={handleCityChange}
+                    placeholder="Selecciona localidad"
+                    emptyMessage={formData.province ? "No se encontraron localidades" : "Selecciona una provincia primero"}
+                    loading={loadingLocalities}
+                    disabled={loading || !formData.province}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="category">Categoría Sugerida</Label>
                 <Select
@@ -271,11 +340,11 @@ export default function PublicRegisterPlayerPage() {
               </div>
 
               {/* Bot Protection / Captcha */}
-              <div className="p-4 bg-secondary/20 rounded-lg border border-border">
+              <div className="p-4 bg-secondary/20 rounded-lg border border-border mt-4">
                   <Label htmlFor="captcha" className="block mb-2 font-medium">Pregunta de Seguridad *</Label>
                   <div className="flex items-center gap-3">
-                      <div className="bg-secondary px-4 py-2 rounded font-mono font-bold text-lg select-none">
-                          {captcha.a} + {captcha.b} = ?
+                      <div className="bg-secondary px-4 py-2 rounded font-mono font-bold text-lg select-none min-w-[100px] text-center">
+                          {mounted ? `${captcha.a} + ${captcha.b} = ?` : '...'}
                       </div>
                       <Input
                           id="captcha"

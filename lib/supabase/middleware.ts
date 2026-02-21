@@ -65,6 +65,13 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
   
+  // If user is NOT logged in and tries to access /register-player, redirect to public registration
+  if (!user && path === '/register-player') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/register-player/public'
+    return NextResponse.redirect(url)
+  }
+
   // If user is NOT logged in and tries to access protected routes (anything not public, auth, or root)
   if (!user && !isPublicRoute && !isAuthRoute && path !== '/') {
     const url = request.nextUrl.clone()
