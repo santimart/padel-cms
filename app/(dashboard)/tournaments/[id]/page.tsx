@@ -141,7 +141,7 @@ export default function TournamentDetailPage() {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline', className: string }> = {
-      registration: { label: 'Inscripción Abierta', variant: 'default', className: '' },
+      registration: { label: 'Inscripción Abierta', variant: 'default', className: 'bg-chart-4 border-chart-4 text-white font-bold' },
       zones: { label: 'Fase de Zonas', variant: 'secondary', className: '' },
       playoffs: { label: 'Playoffs', variant: 'secondary', className: 'bg-chart-3 border-chart-3 text-white font-bold' },
       finished: { label: 'Finalizado', variant: 'outline', className: 'bg-chart-1 border-chart-1 text-white font-bold' },
