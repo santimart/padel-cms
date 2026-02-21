@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { ProfileMenu } from '@/components/dashboard/profile-menu'
+import { useScrollDirection } from '@/hooks/use-scroll-direction'
 
 interface DashboardHeaderProps {
   complexName?: string
@@ -10,9 +11,12 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ complexName, logoUrl }: DashboardHeaderProps) {
+  const { scrollDirection, isTop } = useScrollDirection();
 
   return (
-    <header className="sticky top-0 z-50 mb-10 bg-white/40">
+    <header className={`sticky top-0 z-50 mb-10 bg-white/40 transition-transform duration-300 ease-in-out ${
+      scrollDirection === 'down' && !isTop ? '-translate-y-full' : 'translate-y-0'
+    }`}>
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           {logoUrl ? (
