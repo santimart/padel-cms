@@ -166,8 +166,8 @@ export default function PublicRegisterPlayerPage() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
-          <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl font-bold text-primary-foreground">P</span>
+          <div className=" flex items-center justify-center mx-auto mb-4">
+            <span className="text-xl font-bold text-primary">ReRank</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">Registrate como Jugador</h1>
           <p className="text-muted-foreground">
