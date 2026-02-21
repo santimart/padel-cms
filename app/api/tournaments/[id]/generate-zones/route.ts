@@ -11,6 +11,20 @@ export async function POST(
     const { id: tournamentId } = await params
     const supabase = await createClient()
 
+    // Read body if it exists
+    let body: any = {}
+    try {
+      const text = await request.text()
+      if (text) {
+        body = JSON.parse(text)
+      }
+    } catch (e) {
+      // Ignore parse error
+    }
+
+    const mode = body.mode || 'confirm'
+    const finalDistribution = body.distribution
+
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) {
@@ -65,9 +79,13 @@ export async function POST(
       )
     }
 
-    // Get all pairs for this tournament
+    // Get all pairs for this tournament with player data
     const { data: pairs, error: pairsError } = await (supabase as any).from('pairs')
-      .select('*')
+      .select(`
+        *,
+        player1:players!pairs_player1_id_fkey(*),
+        player2:players!pairs_player2_id_fkey(*)
+      `)
       .eq('tournament_id', tournamentId)
       .order('created_at', { ascending: true })
 
@@ -82,9 +100,30 @@ export async function POST(
       )
     }
 
-    // Generate zone distribution
-    const { numZones, pairsPerZone } = generateZones(pairs.length)
-    const distribution = distributePairsIntoZones(pairs, pairsPerZone)
+    // Generate zone distribution (or use provided one)
+    let distribution: Record<string | number, any[]> = {}
+    let numZones = 0
+
+    if (mode === 'preview') {
+      const generated = generateZones(pairs.length)
+      numZones = generated.numZones
+      distribution = distributePairsIntoZones(pairs, generated.pairsPerZone)
+      
+      return NextResponse.json({
+        success: true,
+        proposal: distribution,
+        numZones
+      })
+    } else if (mode === 'confirm' && finalDistribution) {
+      distribution = finalDistribution
+      // if finalDistribution is an array, we count its length, otherwise Object.keys
+      numZones = Array.isArray(distribution) ? distribution.length : Object.keys(distribution).length
+    } else {
+      // Fallback if confirm is called without distribution
+      const generated = generateZones(pairs.length)
+      numZones = generated.numZones
+      distribution = distributePairsIntoZones(pairs, generated.pairsPerZone)
+    }
 
     // Create zones in database
     const zonesData = []
@@ -109,7 +148,7 @@ export async function POST(
       const zonePairs = distribution[i]
 
       if (zonePairs && zonePairs.length > 0) {
-        const pairUpdates = zonePairs.map(pair => ({
+        const pairUpdates = zonePairs.map((pair: any) => ({
           id: pair.id,
           zone_id: zone.id,
         }))
